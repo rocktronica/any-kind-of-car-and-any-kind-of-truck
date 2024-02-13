@@ -13,7 +13,7 @@ ardens="/Applications/Ardens/ArdensPlayer.app/Contents/MacOS/ArdensPlayer"
 input_path="arduino/$stub"
 build_path="$PWD/build"
 
-mkdir -pv "$build_path"
+mkdir -pv "$build_path" >/dev/null
 
 arduino-cli compile \
     --fqbn arduboy:avr:arduboy \
