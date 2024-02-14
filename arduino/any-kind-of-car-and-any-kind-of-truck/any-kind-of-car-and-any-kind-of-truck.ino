@@ -10,29 +10,11 @@ Arduboy2 arduboy;
 GameStatus gameStatus = GameStatus::Play;
 
 struct Body {
-  uint8_t x;
-  uint8_t y;
-
   uint8_t width;
   uint8_t height;
 
-  void draw() {
+  void draw(uint8_t x, uint8_t y) {
     arduboy.drawRect(x, y, width, height);
-  }
-
-  void update() {}
-
-  // TODO: combine left + right
-  uint8_t getWheelLeftX(uint8_t radius) {
-    return x + radius;
-  }
-
-  uint8_t getWheelRightX(uint8_t radius) {
-    return x + width - radius;
-  }
-
-  uint8_t getWheelY() {
-    return y + height;
   }
 };
 
@@ -42,19 +24,13 @@ struct Wheel {
 
   uint8_t radius;
 
-  void setXY(uint8_t _x, uint8_t _y) {
-    x = _x;
-    y = _y;
-  }
-
-  void draw() {
+  void draw(uint8_t x, uint8_t y) {
     arduboy.drawCircle(x, y, radius);
   }
 };
 
-// TODO: what all really needs XY?
 struct Car {
-  Body body = {20, 20, 50, 30};
+  Body body = {50, 30};
 
   uint8_t wheelRadius = 10;
 
@@ -63,19 +39,15 @@ struct Car {
     {0, 0, wheelRadius},
   };
 
-  void draw() {
-    body.draw();
+  void draw(uint8_t x, uint8_t y) {
+    body.draw(x, y);
 
-    // TODO: tidy
     uint8_t wheelsX[2] = {
-      body.getWheelLeftX(wheels[0].radius),
-      body.getWheelRightX(wheels[1].radius)
+      wheelRadius,
+      body.width - wheelRadius,
     };
-
-    uint8_t wheelsY = body.getWheelY();
     for (uint8_t i = 0; i < 2; i++) {
-      wheels[i].setXY(wheelsX[i], wheelsY);
-      wheels[i].draw();
+      wheels[i].draw(x + wheelsX[i], y + body.height);
     }
   }
 };
@@ -100,7 +72,7 @@ void titleScreen() {
 }
 
 void play() {
-  car.draw();
+  car.draw(30, 10);
 
   if (arduboy.justPressed(A_BUTTON)) {
     gameStatus = GameStatus::TitleScreen;
