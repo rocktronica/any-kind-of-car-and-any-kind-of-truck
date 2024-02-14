@@ -9,38 +9,38 @@ Arduboy2 arduboy;
 
 GameStatus gameStatus = GameStatus::Play;
 
+uint8_t fillet = 5;
+
 struct Body {
   uint8_t width;
   uint8_t height;
 
   void draw(uint8_t x, uint8_t y) {
-    arduboy.drawRect(x, y, width, height);
+    arduboy.drawRoundRect(x, y, width, height, fillet);
   }
 };
 
+// TODO: aesthetic radii only
 struct Wheel {
-  uint8_t x;
-  uint8_t y;
-
   uint8_t radius;
 
+  void update(uint8_t _radius) {
+    radius = _radius;
+  }
+
   void draw(uint8_t x, uint8_t y) {
-    arduboy.drawCircle(x, y, radius);
+    arduboy.fillCircle(x, y, radius, WHITE);
+    arduboy.fillCircle(x, y, radius - 1, BLACK);
   }
 };
 
 struct Car {
   Body body;
-
-  uint8_t wheelRadius = 10;
-
-  Wheel wheels[2] = {
-    {0, 0, wheelRadius},
-    {0, 0, wheelRadius},
-  };
+  uint8_t wheelRadius;
+  Wheel wheels[2];
 
   uint8_t getHeight() {
-    return body.height + wheelRadius;
+    return body.height + wheels[0].radius;
   }
 
   uint8_t getWidth() {
@@ -50,23 +50,34 @@ struct Car {
   void update(
     uint8_t bodyWidth,
     uint8_t bodyHeight,
-    uint8_t _wheelRadius
+    uint8_t wheelRadius
   ) {
     body.width = bodyWidth;
     body.height = bodyHeight;
 
-    wheelRadius = min(body.width / 4, _wheelRadius);
+    // TODO: extract fixing
+    wheelRadius = min(
+      body.height,
+      min(body.width / 4, wheelRadius)
+    );
     for (uint8_t i = 0; i < 2; i++) {
-      wheels[i].radius = wheelRadius;
+      wheels[i].update(wheelRadius);
     }
+  }
+
+  void debug() {
+    arduboy.println("bodyWidth: " + String(body.width));
+    arduboy.println("bodyHeight: " + String(body.height));
+    arduboy.println("wheelRadius: " + String(wheels[0].radius));
   }
 
   void draw(uint8_t x, uint8_t y) {
     body.draw(x, y);
 
+    // TODO: arbitrary positions
     uint8_t wheelsX[2] = {
-      wheelRadius,
-      body.width - wheelRadius,
+      wheels[0].radius,
+      body.width - wheels[0].radius,
     };
     for (uint8_t i = 0; i < 2; i++) {
       wheels[i].draw(x + wheelsX[i], y + body.height);
@@ -84,6 +95,7 @@ void setup() {
   car.update(50, 30, 5);
 
   arduboy.initRandomSeed();
+  arduboy.invert(true);
 }
 
 void titleScreen() {
@@ -103,9 +115,11 @@ void play() {
     (WIDTH - car.getWidth()) / 2,
     (HEIGHT - car.getHeight()) / 2
   );
+  // car.debug();
 
   uint8_t gutter = 10;
   if (arduboy.pressed(A_BUTTON)) {
+      // TODO: extract and tidy
       car.update(
         random(10, WIDTH - gutter * 2),
         random(10, HEIGHT - gutter * 2),
