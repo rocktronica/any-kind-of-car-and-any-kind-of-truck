@@ -30,7 +30,7 @@ struct Wheel {
 };
 
 struct Car {
-  Body body = {50, 30};
+  Body body;
 
   uint8_t wheelRadius = 10;
 
@@ -38,6 +38,28 @@ struct Car {
     {0, 0, wheelRadius},
     {0, 0, wheelRadius},
   };
+
+  uint8_t getHeight() {
+    return body.height + wheelRadius;
+  }
+
+  uint8_t getWidth() {
+    return body.width;
+  }
+
+  void update(
+    uint8_t bodyWidth,
+    uint8_t bodyHeight,
+    uint8_t _wheelRadius
+  ) {
+    body.width = bodyWidth;
+    body.height = bodyHeight;
+
+    wheelRadius = min(body.width / 4, _wheelRadius);
+    for (uint8_t i = 0; i < 2; i++) {
+      wheels[i].radius = wheelRadius;
+    }
+  }
 
   void draw(uint8_t x, uint8_t y) {
     body.draw(x, y);
@@ -57,6 +79,11 @@ Car car;
 void setup() {
   arduboy.boot(); // TODO: use .begin() for Arduboy splash
   arduboy.setFrameRate(15);
+
+  // TODO: extract defaults
+  car.update(50, 30, 5);
+
+  arduboy.initRandomSeed();
 }
 
 void titleScreen() {
@@ -72,10 +99,18 @@ void titleScreen() {
 }
 
 void play() {
-  car.draw(30, 10);
+  car.draw(
+    (WIDTH - car.getWidth()) / 2,
+    (HEIGHT - car.getHeight()) / 2
+  );
 
-  if (arduboy.justPressed(A_BUTTON)) {
-    gameStatus = GameStatus::TitleScreen;
+  uint8_t gutter = 10;
+  if (arduboy.pressed(A_BUTTON)) {
+      car.update(
+        random(10, WIDTH - gutter * 2),
+        random(10, HEIGHT - gutter * 2),
+        random(4, 30)
+      );
   }
 }
 
