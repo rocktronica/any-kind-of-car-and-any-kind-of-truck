@@ -7,34 +7,80 @@ enum class GameStatus : uint8_t {
 
 Arduboy2 arduboy;
 
-GameStatus gameStatus = GameStatus::TitleScreen;
+GameStatus gameStatus = GameStatus::Play;
+
+struct Body {
+  uint8_t x;
+  uint8_t y;
+
+  uint8_t width;
+  uint8_t height;
+
+  void draw() {
+    arduboy.drawRect(x, y, width, height);
+  }
+
+  void update() {}
+
+  // TODO: combine left + right
+  uint8_t getWheelLeftX(uint8_t radius) {
+    return x + radius;
+  }
+
+  uint8_t getWheelRightX(uint8_t radius) {
+    return x + width - radius;
+  }
+
+  uint8_t getWheelY() {
+    return y + height;
+  }
+};
 
 struct Wheel {
   uint8_t x;
   uint8_t y;
 
-  bool up;
+  uint8_t radius;
 
-  void draw() {
-    arduboy.drawCircle(x, y, 5, WHITE);
+  void setXY(uint8_t _x, uint8_t _y) {
+    x = _x;
+    y = _y;
   }
 
-  void update() {
-    if (up) {
-      y -= 1;
+  void draw() {
+    arduboy.drawCircle(x, y, radius);
+  }
+};
 
-      if (y <= 10) {
-        up = false;
-      }
-    } else {
-      y += 1;
+// TODO: what all really needs XY?
+struct Car {
+  Body body = {20, 20, 50, 30};
 
-      if (y >= 40) {
-        up = true;
-      }
+  uint8_t wheelRadius = 10;
+
+  Wheel wheels[2] = {
+    {0, 0, wheelRadius},
+    {0, 0, wheelRadius},
+  };
+
+  void draw() {
+    body.draw();
+
+    // TODO: tidy
+    uint8_t wheelsX[2] = {
+      body.getWheelLeftX(wheels[0].radius),
+      body.getWheelRightX(wheels[1].radius)
+    };
+
+    uint8_t wheelsY = body.getWheelY();
+    for (uint8_t i = 0; i < 2; i++) {
+      wheels[i].setXY(wheelsX[i], wheelsY);
+      wheels[i].draw();
     }
   }
 };
+
+Car car;
 
 void setup() {
   arduboy.boot(); // TODO: use .begin() for Arduboy splash
@@ -53,16 +99,8 @@ void titleScreen() {
   }
 }
 
-Wheel wheels[2] = {
-  {10, 10},
-  {30, 10},
-};
-
 void play() {
-  for (uint8_t i = 0; i < 2; i++) {
-    wheels[i].update();
-    wheels[i].draw();
-  }
+  car.draw();
 
   if (arduboy.justPressed(A_BUTTON)) {
     gameStatus = GameStatus::TitleScreen;
