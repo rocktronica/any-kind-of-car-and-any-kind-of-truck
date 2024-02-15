@@ -38,6 +38,8 @@ struct Car {
   Body body;
   uint8_t wheelRadius;
   Wheel wheels[2];
+  uint8_t wheelsDistance;
+  uint8_t wheelsXOffset;
 
   uint8_t getHeight() {
     return body.height + wheels[0].radius;
@@ -63,6 +65,9 @@ struct Car {
     for (uint8_t i = 0; i < 2; i++) {
       wheels[i].update(wheelRadius);
     }
+
+    wheelsXOffset = getWheelsXOffset();
+    wheelsDistance = getWheelsDistance();
   }
 
   void debug() {
@@ -71,13 +76,26 @@ struct Car {
     arduboy.println("wheelRadius: " + String(wheels[0].radius));
   }
 
+  uint8_t getWheelsXOffset() {
+    uint8_t min = wheels[0].radius;
+    uint8_t max = body.width - wheels[0].radius * 3 - 1;
+
+    return random(min, max + 1);
+  }
+
+  uint8_t getWheelsDistance() {
+    uint8_t max = body.width - wheelsXOffset - wheels[0].radius - 1;
+    uint8_t min = wheels[0].radius * 2;
+
+    return random(min, max + 1);
+  };
+
   void draw(uint8_t x, uint8_t y) {
     body.draw(x, y);
 
-    // TODO: arbitrary positions
     uint8_t wheelsX[2] = {
-      wheels[0].radius,
-      body.width - wheels[0].radius,
+      wheelsXOffset,
+      wheelsXOffset + wheelsDistance,
     };
     for (uint8_t i = 0; i < 2; i++) {
       wheels[i].draw(x + wheelsX[i], y + body.height);
