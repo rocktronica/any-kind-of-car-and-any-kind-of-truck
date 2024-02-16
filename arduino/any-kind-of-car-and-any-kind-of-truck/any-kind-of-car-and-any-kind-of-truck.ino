@@ -9,12 +9,12 @@ Arduboy2 arduboy;
 
 GameStatus gameStatus = GameStatus::Play;
 
-# define MIN_CAR_WIDTH      10
-# define MIN_CAR_HEIGHT     10
-# define MAX_CAR_WIDTH      WIDTH - 20
-# define MAX_CAR_HEIGHT     HEIGHT - 20
-# define MIN_WHEEL_RADIUS   4
-# define MAX_WHEEL_RADIUS   30
+# define MIN_CAR_WIDTH      20
+# define MIN_CAR_HEIGHT     20
+# define MAX_CAR_WIDTH      80
+# define MAX_CAR_HEIGHT     30
+# define MIN_WHEEL_RADIUS   5
+# define MAX_WHEEL_RADIUS   10
 
 class Body {
   public:
