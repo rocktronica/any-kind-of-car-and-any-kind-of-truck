@@ -34,10 +34,12 @@ class Cab {
     uint8_t height;
 
     void draw(uint8_t x, uint8_t y) {
+      // TODO: de-hack, remove odd inner lines
       arduboy.drawRoundRect(x, y, width, height, fillet, WHITE);
       arduboy.fillRoundRect(x + 1, y + 1, width - 2, height - 2, fillet - 1, BLACK);
+      arduboy.fillRect(x + 1, y + height - fillet - 1, width - 2, fillet + 1, BLACK);
 
-      // TODO: arbitrary widths, heights beyond cab height
+      // TODO: arbitrary widths, heights beyond cab height, extract?
       uint8_t window_width = (width - (gutter + 1) * 2) / 2;
       uint8_t window_height = height;
 
@@ -46,7 +48,7 @@ class Cab {
         y + (gutter + 1),
         window_width,
         height - (gutter + 1) * 2,
-        fillet - (gutter + 1)
+        max(0, fillet - (gutter + 1))
       );
     }
 
@@ -102,7 +104,7 @@ class Car {
     }
 
     uint8_t getWidth() {
-      // TODO: account for cab and wheelsXOffset
+      // TODO: account for cab
       return box.width;
     }
 
@@ -155,7 +157,10 @@ class Car {
       wheelsDistance = getWheelsDistance(true);
 
       // TODO: don't always center against wheels?
-      cabXOffset = wheelsXOffset + wheelsDistance / 2 - cab.width / 2;
+      cabXOffset = min(
+        box.width - cab.width,
+        max(0, wheelsXOffset + wheelsDistance / 2 - cab.width / 2)
+      );
     }
 
     void debug() {
