@@ -39,6 +39,25 @@ struct Box {
   uint8_t height;
 };
 
+struct Xy {
+  uint8_t x;
+  uint8_t y;
+};
+
+// TODO: use faster horizontal/vertical methods
+// TODO: chamfer
+void polygon(Xy points[], uint8_t size) {
+  Xy lastPoint = {0,0};
+
+  for (int i = 0; i < size; i++) {
+    if (i > 0) {
+      arduboy.drawLine(points[i].x, points[i].y, lastPoint.x, lastPoint.y);
+    }
+
+    lastPoint = points[i];
+  }
+};
+
 class Wheel {
   public:
     uint8_t radius;
@@ -159,18 +178,19 @@ class Car {
       uint8_t boxX = x;
       uint8_t boxY = y + cab.height;
 
-      // TODO: extract into polygon()?
-      // TODO: use faster horizontal/vertical methods
-
       // Clockwise from top left of box
-      arduboy.drawLine(boxX, boxY, cabX, boxY);
-      arduboy.drawLine(cabX, boxY, cabX, cabY);
-      arduboy.drawLine(cabX, cabY, cabX + cab.width - 1, cabY);
-      arduboy.drawLine(cabX + cab.width - 1, cabY, cabX + cab.width - 1, boxY);
-      arduboy.drawLine(cabX + cab.width - 1, boxY, boxX + box.width - 1, boxY);
-      arduboy.drawLine(boxX + box.width - 1, boxY, boxX + box.width - 1, boxY + box.height - 1);
-      arduboy.drawLine(boxX + box.width - 1, boxY + box.height - 1, boxX, boxY + box.height - 1);
-      arduboy.drawLine(boxX, boxY + box.height - 1, boxX, boxY);
+      Xy points[9] = {
+        {boxX, boxY},
+        {cabX, boxY},
+        {cabX, cabY},
+        {cabX + cab.width - 1, cabY},
+        {cabX + cab.width - 1, boxY},
+        {boxX + box.width - 1, boxY},
+        {boxX + box.width - 1, boxY + box.height - 1},
+        {boxX, boxY + box.height - 1},
+        {boxX, boxY},
+      };
+      polygon(points, 9);
     }
 
     uint8_t getWheelsXOffset(bool randomize) {
