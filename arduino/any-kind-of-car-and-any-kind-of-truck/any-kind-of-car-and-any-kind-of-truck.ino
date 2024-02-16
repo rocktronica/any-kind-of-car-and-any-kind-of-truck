@@ -28,30 +28,15 @@ GameStatus gameStatus = GameStatus::Play;
 # define INVERT             false
 # define DEBUG              false
 
-class Cab {
-  public:
-    uint8_t width;
-    uint8_t height;
-
-    uint8_t fillet = 5;
-
-    void draw(uint8_t x, uint8_t y) {
-      arduboy.drawRoundRect(x, y, width, height, fillet, WHITE);
-      arduboy.fillRoundRect(x + 1, y + 1, width - 2, height - 2, fillet - 1, BLACK);
-    }
+struct Cab {
+  uint8_t width;
+  uint8_t height;
+  uint8_t xOffset;
 };
 
-class Box {
-  public:
-    uint8_t width;
-    uint8_t height;
-
-    void draw(uint8_t x, uint8_t y) {
-      arduboy.drawRoundRect(x, y, width, height, fillet);
-    }
-
-  private:
-    uint8_t fillet = 5;
+struct Box {
+  uint8_t width;
+  uint8_t height;
 };
 
 class Wheel {
@@ -83,7 +68,7 @@ class Car {
     uint8_t wheelsXOffset;
 
     uint8_t getHeight() {
-      return cab.height + box.height - cabBoxOverlap + wheels[0].radius;
+      return cab.height + box.height + wheels[0].radius + 1;
     }
 
     uint8_t getWidth() {
@@ -120,7 +105,7 @@ class Car {
       wheelsXOffset = getWheelsXOffset(false);
       wheelsDistance = getWheelsDistance(false);
 
-      cabXOffset = 0;
+      cab.xOffset = 0;
     }
 
     void randomize() {
@@ -137,7 +122,7 @@ class Car {
       wheelsDistance = getWheelsDistance(true);
 
       // TODO: don't always center against wheels?
-      cabXOffset = min(
+      cab.xOffset = min(
         box.width - cab.width,
         max(0, wheelsXOffset + wheelsDistance / 2 - cab.width / 2)
       );
@@ -151,28 +136,42 @@ class Car {
       arduboy.println("wheelRadius: " + String(wheels[0].radius));
     }
 
-    // NOTE: order is intentional!
     void draw(uint8_t x, uint8_t y) {
-      cab.draw(x + cabXOffset, y);
-      box.draw(x, y + cab.height - cabBoxOverlap);
-      coverSeam(x + cabXOffset, y);
-
-      drawWindow(x + cabXOffset, y);
+      drawOutline(x, y);
+      drawWindow(x + cab.xOffset, y);
 
       uint8_t wheelsX[2] = {wheelsXOffset, wheelsXOffset + wheelsDistance};
       for (uint8_t i = 0; i < 2; i++) {
         wheels[i].draw(
           x + wheelsX[i],
-          y + cab.height + box.height - cabBoxOverlap - 1
+          y + cab.height + box.height
         );
       }
     }
 
   private:
+    uint8_t fillet = 5;
     uint8_t minWheelXOffset = 0;
 
-    uint8_t cabXOffset;
-    uint8_t cabBoxOverlap = 5 + 1; // TODO: vs fillet
+    void drawOutline(uint8_t x, uint8_t y) {
+      uint8_t cabX = x + cab.xOffset;
+      uint8_t cabY = y;
+      uint8_t boxX = x;
+      uint8_t boxY = y + cab.height;
+
+      // TODO: extract into polygon()?
+      // TODO: use faster horizontal/vertical methods
+
+      // Clockwise from top left of box
+      arduboy.drawLine(boxX, boxY, cabX, boxY);
+      arduboy.drawLine(cabX, boxY, cabX, cabY);
+      arduboy.drawLine(cabX, cabY, cabX + cab.width - 1, cabY);
+      arduboy.drawLine(cabX + cab.width - 1, cabY, cabX + cab.width - 1, boxY);
+      arduboy.drawLine(cabX + cab.width - 1, boxY, boxX + box.width - 1, boxY);
+      arduboy.drawLine(boxX + box.width - 1, boxY, boxX + box.width - 1, boxY + box.height - 1);
+      arduboy.drawLine(boxX + box.width - 1, boxY + box.height - 1, boxX, boxY + box.height - 1);
+      arduboy.drawLine(boxX, boxY + box.height - 1, boxX, boxY);
+    }
 
     uint8_t getWheelsXOffset(bool randomize) {
       uint8_t min = minWheelXOffset;
@@ -196,36 +195,23 @@ class Car {
       return max;
     };
 
-    void coverSeam(uint8_t cabX, uint8_t cabY) {
-      // Cover inner and lower. Good but incomplete...
-      arduboy.fillRect(
-        cabX + 1,
-        cabY + cab.height - cabBoxOverlap,
-        cab.width - 2,
-        cabBoxOverlap - 0,
-        BLACK
-      );
-    }
-
     void drawWindow(uint8_t cabX, uint8_t cabY) {
       uint8_t gutter = 2;
 
-      // TODO: arbitrary dimensions
+      // TODO: arbitrary dimensions, condionally account for wheel
       uint8_t width = (cab.width - (gutter + 1) * 2) / 2;
       uint8_t height = getHeight() - wheels[0].radius * 2 - (gutter + 1) * 2;
 
-      uint8_t fillet = max(0, cab.fillet - (gutter + 1));
+      uint8_t window_fillet = max(0, fillet - (gutter + 1));
 
       arduboy.drawRoundRect(
         cabX + (cab.width - width) - (gutter + 1),
         cabY + (gutter + 1),
         width,
-        max(fillet * 2, height),
-        fillet
+        max(window_fillet * 2, height),
+        window_fillet
       );
     }
-
-
 };
 
 Car car;
