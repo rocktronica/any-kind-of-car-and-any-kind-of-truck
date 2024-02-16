@@ -31,7 +31,6 @@ class Body {
     uint8_t fillet = 5;
 };
 
-// TODO: aesthetic radii only
 class Wheel {
   public:
     uint8_t radius;
@@ -41,7 +40,7 @@ class Wheel {
     }
 
     void draw(uint8_t x, uint8_t y) {
-      arduboy.fillCircle(x, y, radius, WHITE);
+      arduboy.drawCircle(x, y, radius, WHITE);
       arduboy.fillCircle(x, y, radius - tread, BLACK);
     }
 
