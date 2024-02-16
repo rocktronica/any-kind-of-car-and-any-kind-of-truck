@@ -9,6 +9,13 @@ Arduboy2 arduboy;
 
 GameStatus gameStatus = GameStatus::Play;
 
+# define MIN_CAR_WIDTH      10
+# define MIN_CAR_HEIGHT     10
+# define MAX_CAR_WIDTH      WIDTH - 20
+# define MAX_CAR_HEIGHT     HEIGHT - 20
+# define MIN_WHEEL_RADIUS   4
+# define MAX_WHEEL_RADIUS   30
+
 class Body {
   public:
     uint8_t width;
@@ -79,12 +86,10 @@ class Car {
     }
 
     void randomize() {
-      uint8_t gutter = 10; // TODO: extract/obviate
-
       update(
-        random(10, WIDTH - gutter * 2),
-        random(10, HEIGHT - gutter * 2),
-        random(4, 30)
+        random(MIN_CAR_WIDTH, MAX_CAR_WIDTH),
+        random(MIN_CAR_HEIGHT, MAX_CAR_HEIGHT),
+        random(MIN_WHEEL_RADIUS, MAX_WHEEL_RADIUS)
       );
     }
 
