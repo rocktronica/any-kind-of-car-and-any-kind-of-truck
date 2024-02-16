@@ -9,8 +9,6 @@ Arduboy2 arduboy;
 
 GameStatus gameStatus = GameStatus::Play;
 
-uint8_t fillet = 5;
-
 class Body {
   public:
     uint8_t width;
@@ -19,6 +17,9 @@ class Body {
     void draw(uint8_t x, uint8_t y) {
       arduboy.drawRoundRect(x, y, width, height, fillet);
     }
+
+  private:
+    uint8_t fillet = 5;
 };
 
 // TODO: aesthetic radii only
