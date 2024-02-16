@@ -16,6 +16,8 @@ GameStatus gameStatus = GameStatus::Play;
 # define MIN_WHEEL_RADIUS   5
 # define MAX_WHEEL_RADIUS   10
 
+# define DEBUG              false
+
 class Body {
   public:
     uint8_t width;
@@ -170,11 +172,14 @@ void titleScreen() {
 }
 
 void play() {
+  if (DEBUG) {
+    car.debug();
+  }
+
   car.draw(
     (WIDTH - car.getWidth()) / 2,
     (HEIGHT - car.getHeight()) / 2
   );
-  // car.debug();
 
   if (arduboy.pressed(A_BUTTON)) {
       car.randomize();
