@@ -68,6 +68,7 @@ class Car {
         body.height,
         min(body.width / 4, wheelRadius)
       );
+      minWheelXOffset = random(0, wheelRadius + 1);
       for (uint8_t i = 0; i < 2; i++) {
         wheels[i].update(wheelRadius);
       }
@@ -105,15 +106,17 @@ class Car {
     }
 
   private:
+    uint8_t minWheelXOffset;
+
     uint8_t getWheelsXOffset() {
-      uint8_t min = wheels[0].radius;
-      uint8_t max = body.width - wheels[0].radius * 3 - 1;
+      uint8_t min = minWheelXOffset;
+      uint8_t max = body.width - minWheelXOffset - wheels[0].radius * 2 - 1;
 
       return random(min, max + 1);
     }
 
     uint8_t getWheelsDistance() {
-      uint8_t max = body.width - wheelsXOffset - wheels[0].radius - 1;
+      uint8_t max = body.width - wheelsXOffset - 1;
       uint8_t min = wheels[0].radius * 2;
 
       return random(min, max + 1);
