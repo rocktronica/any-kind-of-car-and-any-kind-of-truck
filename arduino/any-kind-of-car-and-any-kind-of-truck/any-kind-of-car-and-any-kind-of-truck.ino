@@ -66,31 +66,39 @@ class Car {
     void update(
       uint8_t bodyWidth,
       uint8_t bodyHeight,
-      uint8_t wheelRadius
+      uint8_t wheelRadius,
+      bool fixValues
     ) {
       body.width = bodyWidth;
       body.height = bodyHeight;
 
-      // TODO: extract fixing
-      wheelRadius = min(
-        body.height,
-        min(body.width / 4, wheelRadius)
-      );
-      minWheelXOffset = random(0, wheelRadius + 1);
+      if (fixValues) {
+        wheelRadius = min(
+          body.height,
+          min(body.width / 4, wheelRadius)
+        );
+      }
+
       for (uint8_t i = 0; i < 2; i++) {
         wheels[i].update(wheelRadius);
       }
 
-      wheelsXOffset = getWheelsXOffset();
-      wheelsDistance = getWheelsDistance();
+      minWheelXOffset = 0;
+      wheelsXOffset = getWheelsXOffset(false);
+      wheelsDistance = getWheelsDistance(false);
     }
 
     void randomize() {
       update(
         random(MIN_CAR_WIDTH, MAX_CAR_WIDTH),
         random(MIN_CAR_HEIGHT, MAX_CAR_HEIGHT),
-        random(MIN_WHEEL_RADIUS, MAX_WHEEL_RADIUS)
+        random(MIN_WHEEL_RADIUS, MAX_WHEEL_RADIUS),
+        true
       );
+
+      minWheelXOffset = random(0, wheelRadius + 1);
+      wheelsXOffset = getWheelsXOffset(true);
+      wheelsDistance = getWheelsDistance(true);
     }
 
     void debug() {
@@ -114,18 +122,26 @@ class Car {
   private:
     uint8_t minWheelXOffset;
 
-    uint8_t getWheelsXOffset() {
+    uint8_t getWheelsXOffset(bool randomize) {
       uint8_t min = minWheelXOffset;
       uint8_t max = body.width - minWheelXOffset - wheels[0].radius * 2 - 1;
 
-      return random(min, max + 1);
+      if (randomize) {
+        return random(min, max + 1);
+      }
+
+      return min;
     }
 
-    uint8_t getWheelsDistance() {
+    uint8_t getWheelsDistance(bool randomize) {
       uint8_t max = body.width - wheelsXOffset - 1;
       uint8_t min = wheels[0].radius * 2;
 
-      return random(min, max + 1);
+      if (randomize) {
+        return random(min, max + 1);
+      }
+
+      return max;
     };
 };
 
