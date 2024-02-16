@@ -11,96 +11,113 @@ GameStatus gameStatus = GameStatus::Play;
 
 uint8_t fillet = 5;
 
-struct Body {
-  uint8_t width;
-  uint8_t height;
+class Body {
+  public:
+    uint8_t width;
+    uint8_t height;
 
-  void draw(uint8_t x, uint8_t y) {
-    arduboy.drawRoundRect(x, y, width, height, fillet);
-  }
+    void draw(uint8_t x, uint8_t y) {
+      arduboy.drawRoundRect(x, y, width, height, fillet);
+    }
 };
 
 // TODO: aesthetic radii only
-struct Wheel {
-  uint8_t radius;
+class Wheel {
+  public:
+    uint8_t radius;
 
-  void update(uint8_t _radius) {
-    radius = _radius;
-  }
+    void update(uint8_t _radius) {
+      radius = _radius;
+    }
 
-  void draw(uint8_t x, uint8_t y) {
-    arduboy.fillCircle(x, y, radius, WHITE);
-    arduboy.fillCircle(x, y, radius - 1, BLACK);
-  }
+    void draw(uint8_t x, uint8_t y) {
+      arduboy.fillCircle(x, y, radius, WHITE);
+      arduboy.fillCircle(x, y, radius - tread, BLACK);
+    }
+
+  private:
+    uint8_t tread = 1;
 };
 
-struct Car {
-  Body body;
-  uint8_t wheelRadius;
-  Wheel wheels[2];
-  uint8_t wheelsDistance;
-  uint8_t wheelsXOffset;
+class Car {
+  public:
+    Body body;
+    uint8_t wheelRadius;
+    Wheel wheels[2];
+    uint8_t wheelsDistance;
+    uint8_t wheelsXOffset;
 
-  uint8_t getHeight() {
-    return body.height + wheels[0].radius;
-  }
-
-  uint8_t getWidth() {
-    return body.width;
-  }
-
-  void update(
-    uint8_t bodyWidth,
-    uint8_t bodyHeight,
-    uint8_t wheelRadius
-  ) {
-    body.width = bodyWidth;
-    body.height = bodyHeight;
-
-    // TODO: extract fixing
-    wheelRadius = min(
-      body.height,
-      min(body.width / 4, wheelRadius)
-    );
-    for (uint8_t i = 0; i < 2; i++) {
-      wheels[i].update(wheelRadius);
+    uint8_t getHeight() {
+      return body.height + wheels[0].radius;
     }
 
-    wheelsXOffset = getWheelsXOffset();
-    wheelsDistance = getWheelsDistance();
-  }
+    uint8_t getWidth() {
+      return body.width;
+    }
 
-  void debug() {
-    arduboy.println("bodyWidth: " + String(body.width));
-    arduboy.println("bodyHeight: " + String(body.height));
-    arduboy.println("wheelRadius: " + String(wheels[0].radius));
-  }
+    void update(
+      uint8_t bodyWidth,
+      uint8_t bodyHeight,
+      uint8_t wheelRadius
+    ) {
+      body.width = bodyWidth;
+      body.height = bodyHeight;
 
-  uint8_t getWheelsXOffset() {
-    uint8_t min = wheels[0].radius;
-    uint8_t max = body.width - wheels[0].radius * 3 - 1;
+      // TODO: extract fixing
+      wheelRadius = min(
+        body.height,
+        min(body.width / 4, wheelRadius)
+      );
+      for (uint8_t i = 0; i < 2; i++) {
+        wheels[i].update(wheelRadius);
+      }
 
-    return random(min, max + 1);
-  }
+      wheelsXOffset = getWheelsXOffset();
+      wheelsDistance = getWheelsDistance();
+    }
 
-  uint8_t getWheelsDistance() {
-    uint8_t max = body.width - wheelsXOffset - wheels[0].radius - 1;
-    uint8_t min = wheels[0].radius * 2;
+    void randomize() {
+      uint8_t gutter = 10; // TODO: extract/obviate
 
-    return random(min, max + 1);
-  };
+      update(
+        random(10, WIDTH - gutter * 2),
+        random(10, HEIGHT - gutter * 2),
+        random(4, 30)
+      );
+    }
 
-  void draw(uint8_t x, uint8_t y) {
-    body.draw(x, y);
+    void debug() {
+      arduboy.println("bodyWidth: " + String(body.width));
+      arduboy.println("bodyHeight: " + String(body.height));
+      arduboy.println("wheelRadius: " + String(wheels[0].radius));
+    }
 
-    uint8_t wheelsX[2] = {
-      wheelsXOffset,
-      wheelsXOffset + wheelsDistance,
+    void draw(uint8_t x, uint8_t y) {
+      body.draw(x, y);
+
+      uint8_t wheelsX[2] = {
+        wheelsXOffset,
+        wheelsXOffset + wheelsDistance,
+      };
+      for (uint8_t i = 0; i < 2; i++) {
+        wheels[i].draw(x + wheelsX[i], y + body.height);
+      }
+    }
+
+  private:
+    uint8_t getWheelsXOffset() {
+      uint8_t min = wheels[0].radius;
+      uint8_t max = body.width - wheels[0].radius * 3 - 1;
+
+      return random(min, max + 1);
+    }
+
+    uint8_t getWheelsDistance() {
+      uint8_t max = body.width - wheelsXOffset - wheels[0].radius - 1;
+      uint8_t min = wheels[0].radius * 2;
+
+      return random(min, max + 1);
     };
-    for (uint8_t i = 0; i < 2; i++) {
-      wheels[i].draw(x + wheelsX[i], y + body.height);
-    }
-  }
 };
 
 Car car;
@@ -109,8 +126,7 @@ void setup() {
   arduboy.boot(); // TODO: use .begin() for Arduboy splash
   arduboy.setFrameRate(15);
 
-  // TODO: extract defaults
-  car.update(50, 30, 5);
+  car.randomize();
 
   arduboy.initRandomSeed();
   arduboy.invert(true);
@@ -135,14 +151,8 @@ void play() {
   );
   // car.debug();
 
-  uint8_t gutter = 10;
   if (arduboy.pressed(A_BUTTON)) {
-      // TODO: extract and tidy
-      car.update(
-        random(10, WIDTH - gutter * 2),
-        random(10, HEIGHT - gutter * 2),
-        random(4, 30)
-      );
+      car.randomize();
   }
 }
 
