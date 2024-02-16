@@ -33,28 +33,12 @@ class Cab {
     uint8_t width;
     uint8_t height;
 
+    uint8_t fillet = 5;
+
     void draw(uint8_t x, uint8_t y) {
-      // TODO: de-hack, remove odd inner lines
       arduboy.drawRoundRect(x, y, width, height, fillet, WHITE);
       arduboy.fillRoundRect(x + 1, y + 1, width - 2, height - 2, fillet - 1, BLACK);
-      arduboy.fillRect(x + 1, y + height - fillet - 1, width - 2, fillet + 1, BLACK);
-
-      // TODO: arbitrary widths, heights beyond cab height, extract?
-      uint8_t window_width = (width - (gutter + 1) * 2) / 2;
-      uint8_t window_height = height;
-
-      arduboy.drawRoundRect(
-        x + (width - window_width) - (gutter + 1),
-        y + (gutter + 1),
-        window_width,
-        height - (gutter + 1) * 2,
-        max(0, fillet - (gutter + 1))
-      );
     }
-
-  private:
-    uint8_t fillet = 5;
-    uint8_t gutter = 2;
 };
 
 class Box {
@@ -95,16 +79,14 @@ class Car {
     Box box;
     Wheel wheels[2];
 
-    uint8_t wheelRadius;
     uint8_t wheelsDistance;
     uint8_t wheelsXOffset;
 
     uint8_t getHeight() {
-      return cab.height + box.height + wheels[0].radius;
+      return cab.height + box.height - cabBoxOverlap + wheels[0].radius;
     }
 
     uint8_t getWidth() {
-      // TODO: account for cab
       return box.width;
     }
 
@@ -135,7 +117,6 @@ class Car {
         wheels[i].update(wheelRadius);
       }
 
-      minWheelXOffset = 0;
       wheelsXOffset = getWheelsXOffset(false);
       wheelsDistance = getWheelsDistance(false);
 
@@ -152,7 +133,6 @@ class Car {
         true
       );
 
-      minWheelXOffset = random(0, wheelRadius + 1);
       wheelsXOffset = getWheelsXOffset(true);
       wheelsDistance = getWheelsDistance(true);
 
@@ -171,10 +151,13 @@ class Car {
       arduboy.println("wheelRadius: " + String(wheels[0].radius));
     }
 
-    // NOTE: order is intentional
+    // NOTE: order is intentional!
     void draw(uint8_t x, uint8_t y) {
-      box.draw(x, y + cab.height - cabBoxOverlap);
       cab.draw(x + cabXOffset, y);
+      box.draw(x, y + cab.height - cabBoxOverlap);
+      coverSeam(x + cabXOffset, y);
+
+      drawWindow(x + cabXOffset, y);
 
       uint8_t wheelsX[2] = {wheelsXOffset, wheelsXOffset + wheelsDistance};
       for (uint8_t i = 0; i < 2; i++) {
@@ -186,7 +169,7 @@ class Car {
     }
 
   private:
-    uint8_t minWheelXOffset;
+    uint8_t minWheelXOffset = 0;
 
     uint8_t cabXOffset;
     uint8_t cabBoxOverlap = 5 + 1; // TODO: vs fillet
@@ -212,6 +195,37 @@ class Car {
 
       return max;
     };
+
+    void coverSeam(uint8_t cabX, uint8_t cabY) {
+      // Cover inner and lower. Good but incomplete...
+      arduboy.fillRect(
+        cabX + 1,
+        cabY + cab.height - cabBoxOverlap,
+        cab.width - 2,
+        cabBoxOverlap - 0,
+        BLACK
+      );
+    }
+
+    void drawWindow(uint8_t cabX, uint8_t cabY) {
+      uint8_t gutter = 2;
+
+      // TODO: arbitrary dimensions
+      uint8_t width = (cab.width - (gutter + 1) * 2) / 2;
+      uint8_t height = getHeight() - wheels[0].radius * 2 - (gutter + 1) * 2;
+
+      uint8_t fillet = max(0, cab.fillet - (gutter + 1));
+
+      arduboy.drawRoundRect(
+        cabX + (cab.width - width) - (gutter + 1),
+        cabY + (gutter + 1),
+        width,
+        max(fillet * 2, height),
+        fillet
+      );
+    }
+
+
 };
 
 Car car;
