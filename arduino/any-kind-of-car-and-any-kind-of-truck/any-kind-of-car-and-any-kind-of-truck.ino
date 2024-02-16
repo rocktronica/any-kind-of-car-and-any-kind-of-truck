@@ -41,11 +41,13 @@ class Wheel {
 
     void draw(uint8_t x, uint8_t y) {
       arduboy.drawCircle(x, y, radius, WHITE);
-      arduboy.fillCircle(x, y, radius - tread, BLACK);
+      arduboy.fillCircle(x, y, radius - 1, BLACK);
+
+      arduboy.drawCircle(x, y, max(0, radius - tread));
     }
 
   private:
-    uint8_t tread = 1;
+    uint8_t tread = 5;
 };
 
 class Car {
