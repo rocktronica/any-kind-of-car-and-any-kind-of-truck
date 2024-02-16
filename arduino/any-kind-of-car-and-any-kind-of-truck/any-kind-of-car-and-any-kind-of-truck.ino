@@ -1,4 +1,5 @@
 #include <Arduboy2.h>
+#include "Images.h"
 
 enum class GameStatus : uint8_t {
   TitleScreen,
@@ -9,6 +10,7 @@ Arduboy2 arduboy;
 
 GameStatus gameStatus = GameStatus::Play;
 
+// REMEMBER: display is 128x64
 # define MIN_CAR_WIDTH      20
 # define MIN_CAR_HEIGHT     20
 # define MAX_CAR_WIDTH      80
@@ -16,6 +18,7 @@ GameStatus gameStatus = GameStatus::Play;
 # define MIN_WHEEL_RADIUS   5
 # define MAX_WHEEL_RADIUS   10
 
+# define INVERT             false
 # define DEBUG              false
 
 class Body {
@@ -157,15 +160,11 @@ void setup() {
   car.randomize();
 
   arduboy.initRandomSeed();
-  arduboy.invert(true);
+  arduboy.invert(INVERT);
 }
 
 void titleScreen() {
-  arduboy.setCursor(12, 20);
-  arduboy.print("Any Kind of Car &");
-
-  arduboy.setCursor(12, 30);
-  arduboy.print("Any Kind of Truck");
+  Sprites::drawOverwrite(0, 0, title, 0);
 
   if (arduboy.justPressed(A_BUTTON)) {
     gameStatus = GameStatus::Play;
