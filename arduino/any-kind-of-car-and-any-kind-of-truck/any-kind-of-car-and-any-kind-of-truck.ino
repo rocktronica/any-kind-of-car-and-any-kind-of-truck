@@ -1,5 +1,6 @@
 #include <Arduboy2.h>
-#include "Images.h"
+#include "images.h"
+#include "utils.h"
 
 enum class GameStatus : uint8_t {
   TitleScreen,
@@ -37,25 +38,6 @@ struct Cab {
 struct Box {
   uint8_t width;
   uint8_t height;
-};
-
-struct Xy {
-  uint8_t x;
-  uint8_t y;
-};
-
-// TODO: use faster horizontal/vertical methods
-// TODO: chamfer
-void polygon(Xy points[], uint8_t size) {
-  Xy lastPoint = {0,0};
-
-  for (int i = 0; i < size; i++) {
-    if (i > 0) {
-      arduboy.drawLine(points[i].x, points[i].y, lastPoint.x, lastPoint.y);
-    }
-
-    lastPoint = points[i];
-  }
 };
 
 class Wheel {
@@ -190,7 +172,7 @@ class Car {
         {boxX, boxY + box.height - 1},
         {boxX, boxY},
       };
-      polygon(points, 9);
+      polygon(points, 9, arduboy);
     }
 
     uint8_t getWheelsXOffset(bool randomize) {
