@@ -240,6 +240,7 @@ void titleScreen() {
 
   if (arduboy.justPressed(A_BUTTON | B_BUTTON)) {
     gameStatus = GameStatus::Play;
+    car.randomize();
   }
 }
 
@@ -253,7 +254,11 @@ void play() {
     (HEIGHT - car.getHeight()) / 2
   );
 
-  if (arduboy.justPressed(A_BUTTON | B_BUTTON)) {
+  if (arduboy.justPressed(A_BUTTON)) {
+      gameStatus = GameStatus::TitleScreen;
+  }
+
+  if (arduboy.pressed(B_BUTTON)) {
       car.randomize();
   }
 }
