@@ -5,12 +5,14 @@
 
 // REMEMBER: display is 128x64
 
+// TODO: really, what's the smallest car?
+
 # define MIN_CAB_WIDTH      20
-# define MIN_CAB_HEIGHT     10
-# define MAX_CAB_WIDTH      60
+# define MIN_CAB_HEIGHT     20
+# define MAX_CAB_WIDTH      50
 # define MAX_CAB_HEIGHT     22
 
-# define MIN_BOX_WIDTH      20
+# define MIN_BOX_WIDTH      30
 # define MIN_BOX_HEIGHT     10
 # define MAX_BOX_WIDTH      80
 # define MAX_BOX_HEIGHT     22
@@ -20,11 +22,12 @@
 # define CAB_JOINT_CHAMFER  2
 # define HOOD_CHAMFER       3
 
+// TODO: suspension
 # define MIN_WHEEL_RADIUS   5
-# define MAX_WHEEL_RADIUS   10
+# define MAX_WHEEL_RADIUS   20
 
-# define BUMPER_HEIGHT      6
-# define BUMPER_WIDTH       3
+# define BUMPER_HEIGHT      MIN_BOX_HEIGHT - max(TRUNK_CHAMFER, HOOD_CHAMFER)
+# define BUMPER_WIDTH       2
 
 struct Cab {
   uint8_t width;
@@ -107,6 +110,7 @@ class Vehicle {
     }
 
     void randomize() {
+      // TODO: prefer "typical" shapes
       update(
         random(MIN_CAB_WIDTH, MAX_CAB_WIDTH),
         random(MIN_CAB_HEIGHT, MAX_CAB_HEIGHT),
