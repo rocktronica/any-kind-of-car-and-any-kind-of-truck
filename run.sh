@@ -10,17 +10,20 @@ stub="any-kind-of-car-and-any-kind-of-truck"
 
 ardens="/Applications/Ardens/ArdensPlayer.app/Contents/MacOS/ArdensPlayer"
 
+fbqn="arduboy:avr:arduboy"
+
 input_path="arduino/$stub"
 build_path="$PWD/build"
 
 function help() {
     echo "\
-Compile and emuluate
-
+CLI wrapper around Arduino and Ardens
 
 Usage:
-$0
-$0 -h   Show help and exit
+./run.sh -h         Show help and exit
+
+./run.sh dev        Compile and emuluate
+                    Looped! Quit emulator to refresh
 "
 }
 
@@ -29,22 +32,17 @@ if [ "$1" == '-h' ]; then
     exit
 fi
 
-function run() {
+function compile() {
     mkdir -pv "$build_path" >/dev/null
 
-    while true; do
-        arduino-cli compile \
-            --fqbn arduboy:avr:arduboy \
-            --build-path="$build_path" \
-            "$input_path"
+    arduino-cli compile \
+        --fqbn "$fbqn" \
+        --build-path="$build_path" \
+        "$input_path"
+}
 
-        $ardens file="$build_path/$stub.ino.hex" >/dev/null
-
-        echo
-        echo "!! Press CTRL+C to quit !!"
-
-        echo
-    done
+function emulate() {
+    $ardens file="$build_path/$stub.ino.hex" >/dev/null
 }
 
 if [ "$1" == '-h' ]; then
@@ -52,6 +50,19 @@ if [ "$1" == '-h' ]; then
     exit
 fi
 
-run "${@:1}"
+if [ "$1" == 'dev' ]; then
+    while true; do
+        compile
+        emulate
+
+        echo
+        echo "!! Press CTRL+C to quit !!"
+        echo
+    done
+
+    exit
+fi
+
+help
 
 }
