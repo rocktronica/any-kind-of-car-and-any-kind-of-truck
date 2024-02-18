@@ -161,7 +161,7 @@ class Car {
       uint8_t boxY = y + cab.height;
 
       // Clockwise from top left of box
-      Xy points[9] = {
+      Xy points[8] = {
         {boxX, boxY},
         {cabX, boxY},
         {cabX, cabY},
@@ -170,9 +170,8 @@ class Car {
         {boxX + box.width - 1, boxY},
         {boxX + box.width - 1, boxY + box.height - 1},
         {boxX, boxY + box.height - 1},
-        {boxX, boxY},
       };
-      polygon(points, 9, arduboy);
+      polygon(points, 8, arduboy);
     }
 
     uint8_t getWheelsXOffset(bool randomize) {

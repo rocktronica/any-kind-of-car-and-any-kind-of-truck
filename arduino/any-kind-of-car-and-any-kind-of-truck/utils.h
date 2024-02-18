@@ -9,8 +9,7 @@ struct Xy {
 };
 
 // TODO: use faster horizontal/vertical methods
-// TODO: chamfer
-void polygon(Xy points[], uint8_t size, Arduboy2 arduboy) {
+void drawSegmentedLine(Xy points[], uint8_t size, Arduboy2 arduboy) {
   Xy lastPoint = {0,0};
 
   for (int i = 0; i < size; i++) {
@@ -20,6 +19,12 @@ void polygon(Xy points[], uint8_t size, Arduboy2 arduboy) {
 
     lastPoint = points[i];
   }
+};
+
+// TODO: chamfer
+void polygon(Xy points[], uint8_t size, Arduboy2 arduboy) {
+  drawSegmentedLine(points, size, arduboy);
+  arduboy.drawLine(points[0].x, points[0].y, points[size - 1].x, points[size - 1].y);
 };
 
 #endif
