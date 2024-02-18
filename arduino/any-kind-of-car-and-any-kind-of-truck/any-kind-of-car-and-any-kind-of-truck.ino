@@ -253,7 +253,7 @@ void play() {
     (HEIGHT - car.getHeight()) / 2
   );
 
-  if (arduboy.pressed(A_BUTTON)) {
+  if (arduboy.justPressed(A_BUTTON | B_BUTTON)) {
       car.randomize();
   }
 }
