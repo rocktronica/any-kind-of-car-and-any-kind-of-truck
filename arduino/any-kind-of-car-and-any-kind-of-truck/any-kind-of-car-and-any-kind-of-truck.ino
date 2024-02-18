@@ -153,7 +153,6 @@ class Car {
     }
 
   private:
-    uint8_t fillet = 5;
     uint8_t minWheelXOffset = 0;
 
     void drawOutline(uint8_t x, uint8_t y) {
@@ -173,7 +172,7 @@ class Car {
         {boxX + box.width - 1, boxY + box.height - 1},
         {boxX, boxY + box.height - 1},
       };
-      polygon(points, 8, arduboy);
+      drawPolygon(points, 8, arduboy);
     }
 
     uint8_t getWheelsXOffset(bool randomize) {
@@ -205,14 +204,13 @@ class Car {
       uint8_t width = (cab.width - (gutter + 1) * 2) / 2;
       uint8_t height = getHeight() - wheels[0].radius * 2 - (gutter + 1) * 2;
 
-      uint8_t window_fillet = max(0, fillet - (gutter + 1));
-
-      arduboy.drawRoundRect(
+      drawChamferedRectangle(
         cabX + (cab.width - width) - (gutter + 1),
         cabY + (gutter + 1),
         width,
-        max(window_fillet * 2, height),
-        window_fillet
+        height,
+        2, 2, 2, 2,
+        arduboy
       );
     }
 };

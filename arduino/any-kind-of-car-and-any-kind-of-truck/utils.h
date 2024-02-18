@@ -38,10 +38,43 @@ void drawSegmentedLine(Xy points[], uint8_t size, Arduboy2 arduboy) {
   }
 };
 
-// TODO: chamfer
-void polygon(Xy points[], uint8_t size, Arduboy2 arduboy) {
+void drawPolygon(Xy points[], uint8_t size, Arduboy2 arduboy) {
   drawSegmentedLine(points, size, arduboy);
   drawLine(points[0].x, points[0].y, points[size - 1].x, points[size - 1].y, arduboy);
+};
+
+void drawChamferedRectangle(
+  int16_t 	x,
+  int16_t 	y,
+  uint8_t 	w,
+  uint8_t 	h,
+
+  // NOTES:
+  // * I'm using it as a side instead of the hypotenuse of
+  //   the chamfer's triangle. Mathematically incorrect but
+  //   practically fine and easier to use in practice.
+  // * Chamfers are ordered from top left.
+  uint8_t c0,
+  uint8_t c1,
+  uint8_t c2,
+  uint8_t c3,
+
+  Arduboy2 arduboy
+) {
+  Xy points[8] = {
+    {x + c0, y},
+    {x + w - 1 - c1, y},
+
+    {x + w - 1, y + c1},
+    {x + w - 1, y + h - 1 - c2},
+
+    {x + w - 1 - c2, y + h - 1},
+    {x + c3, y + h - 1},
+
+    {x, y + h - 1 - c3},
+    {x, y + c0},
+  };
+  drawPolygon(points, 8, arduboy);
 };
 
 #endif
