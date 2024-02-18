@@ -15,6 +15,11 @@
 # define MAX_BOX_WIDTH      80
 # define MAX_BOX_HEIGHT     22
 
+# define TRUNK_CHAMFER      3
+# define CAB_TOP_CHAMFER    3
+# define CAB_JOINT_CHAMFER  2
+# define HOOD_CHAMFER       3
+
 # define MIN_WHEEL_RADIUS   5
 # define MAX_WHEEL_RADIUS   10
 
@@ -136,7 +141,7 @@ class Vehicle {
       uint8_t boxY = y + cab.height;
 
       drawOutline(cabX, cabY, boxX, boxY, arduboy);
-      drawWindow(cabX, cabY, arduboy);
+      drawWindows(cabX, cabY, arduboy);
       drawBumpers(boxX, boxY, arduboy);
 
       uint8_t wheelsX[2] = {wheelsXOffset, wheelsXOffset + wheelsDistance};
@@ -160,18 +165,31 @@ class Vehicle {
 
       Arduboy2 arduboy
     ) {
+      uint8_t trunk_chamfer = min(TRUNK_CHAMFER, cab.xOffset);
+      uint8_t hood_chamfer = min(HOOD_CHAMFER, box.width - cab.xOffset - cab.width);
+
+      uint8_t cab_back_joint_chamfer = min(CAB_JOINT_CHAMFER, cab.xOffset - trunk_chamfer);
+      uint8_t cab_front_joint_chamfer =
+        min(CAB_JOINT_CHAMFER, box.width - cab.xOffset - cab.width - hood_chamfer);
+
       // Clockwise from top left of box
-      Xy points[8] = {
-        {boxX, boxY},
-        {cabX, boxY},
-        {cabX, cabY},
-        {cabX + cab.width - 1, cabY},
-        {cabX + cab.width - 1, boxY},
-        {boxX + box.width - 1, boxY},
+      Xy points[14] = {
+        {boxX + trunk_chamfer, boxY},
+        {cabX - cab_back_joint_chamfer, boxY},
+        {cabX, boxY - cab_back_joint_chamfer},
+        {cabX, cabY + CAB_TOP_CHAMFER},
+        {cabX + CAB_TOP_CHAMFER, cabY},
+        {cabX + cab.width - 1 - CAB_TOP_CHAMFER, cabY},
+        {cabX + cab.width - 1, cabY + CAB_TOP_CHAMFER},
+        {cabX + cab.width - 1, boxY - cab_front_joint_chamfer},
+        {cabX + cab.width - 1 + cab_front_joint_chamfer, boxY},
+        {boxX + box.width - 1 - hood_chamfer, boxY},
+        {boxX + box.width - 1, boxY + hood_chamfer},
         {boxX + box.width - 1, boxY + box.height - 1},
         {boxX, boxY + box.height - 1},
+        {boxX, boxY + trunk_chamfer},
       };
-      drawPolygon(points, 8, arduboy);
+      drawPolygon(points, 14, arduboy);
     }
 
     uint8_t getWheelsXOffset(bool randomize) {
@@ -196,20 +214,25 @@ class Vehicle {
       return max;
     };
 
-    void drawWindow(uint8_t cabX, uint8_t cabY, Arduboy2 arduboy) {
+    void drawWindows(uint8_t cabX, uint8_t cabY, Arduboy2 arduboy) {
       uint8_t gutter = 2;
 
-      // TODO: arbitrary dimensions, condionally account for wheel
-      uint8_t width = (cab.width - (gutter + 1) * 2) / 2;
-      uint8_t height = getHeight() - wheels[0].radius * 2 - (gutter + 1) * 2;
+      uint8_t height = cab.height - gutter;
 
       drawChamferedRectangle(
-        cabX + (cab.width - width) - (gutter + 1),
+        cabX + (gutter + 1),
         cabY + (gutter + 1),
-        width,
+        cab.width - (gutter + 1) * 2,
         height,
-        2, 2, 2, 2,
+        CAB_TOP_CHAMFER - gutter, CAB_TOP_CHAMFER - gutter, 0, 0,
         arduboy
+      );
+
+      // TODO: arbitrary split placement
+      arduboy.drawFastVLine(
+        cabX + (gutter + 1) + (cab.width - (gutter + 1) * 2) * .4,
+        cabY + (gutter + 1),
+        cab.height - 2
       );
     }
 
