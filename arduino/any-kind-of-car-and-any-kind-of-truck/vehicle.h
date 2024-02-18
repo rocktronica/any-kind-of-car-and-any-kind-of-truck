@@ -18,6 +18,9 @@
 # define MIN_WHEEL_RADIUS   5
 # define MAX_WHEEL_RADIUS   10
 
+# define BUMPER_HEIGHT      6
+# define BUMPER_WIDTH       3
+
 struct Cab {
   uint8_t width;
   uint8_t height;
@@ -134,6 +137,7 @@ class Vehicle {
 
       drawOutline(cabX, cabY, boxX, boxY, arduboy);
       drawWindow(cabX, cabY, arduboy);
+      drawBumpers(boxX, boxY, arduboy);
 
       uint8_t wheelsX[2] = {wheelsXOffset, wheelsXOffset + wheelsDistance};
       for (uint8_t i = 0; i < 2; i++) {
@@ -205,6 +209,31 @@ class Vehicle {
         width,
         height,
         2, 2, 2, 2,
+        arduboy
+      );
+    }
+
+    void drawBumpers(int8_t boxX, uint8_t boxY, Arduboy2 arduboy) {
+      uint8_t height = min(BUMPER_HEIGHT, MIN_BOX_HEIGHT);
+      uint8_t width = BUMPER_WIDTH + 1;
+
+      // Left
+      drawChamferedRectangle(
+        boxX - width + 1,
+        boxY + box.height - height,
+        width,
+        height,
+        2, 0, 0, 2,
+        arduboy
+      );
+
+      // Right
+      drawChamferedRectangle(
+        boxX + box.width - 1,
+        boxY + box.height - height,
+        width,
+        height,
+        0, 2, 2, 0,
         arduboy
       );
     }
