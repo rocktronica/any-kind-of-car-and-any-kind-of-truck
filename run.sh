@@ -11,6 +11,7 @@ stub="any-kind-of-car-and-any-kind-of-truck"
 ardens="/Applications/Ardens/ArdensPlayer.app/Contents/MacOS/ArdensPlayer"
 
 fbqn="arduboy:avr:arduboy"
+port="/dev/cu.usbmodem143101"
 
 input_path="arduino/$stub"
 build_path="$PWD/build"
@@ -24,6 +25,7 @@ Usage:
 
 ./run.sh dev        Compile and emuluate
                     Looped! Quit emulator to refresh
+./run.sh deploy     Compile and upload
 "
 }
 
@@ -45,6 +47,13 @@ function emulate() {
     $ardens file="$build_path/$stub.ino.hex" >/dev/null
 }
 
+function upload() {
+    arduino-cli upload \
+        --fqbn "$fbqn" \
+        --port "$port" \
+        --input-file "$build_path/$stub.ino.hex"
+}
+
 if [ "$1" == '-h' ]; then
     help
     exit
@@ -59,6 +68,13 @@ if [ "$1" == 'dev' ]; then
         echo "!! Press CTRL+C to quit !!"
         echo
     done
+
+    exit
+fi
+
+if [ "$1" == 'deploy' ]; then
+    compile
+    upload
 
     exit
 fi
