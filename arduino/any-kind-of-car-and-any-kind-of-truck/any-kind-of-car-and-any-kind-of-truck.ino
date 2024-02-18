@@ -1,4 +1,5 @@
 #include <Arduboy2.h>
+#include <Tinyfont.h>
 #include "images.h"
 #include "utils.h"
 
@@ -8,8 +9,9 @@ enum class GameStatus : uint8_t {
 };
 
 Arduboy2 arduboy;
+Tinyfont tinyfont = Tinyfont(arduboy.sBuffer, WIDTH, HEIGHT);
 
-GameStatus gameStatus = GameStatus::Play;
+GameStatus gameStatus = GameStatus::TitleScreen;
 
 // REMEMBER: display is 128x64
 
@@ -228,9 +230,17 @@ void setup() {
 }
 
 void titleScreen() {
-  Sprites::drawOverwrite(0, 0, title, 0);
+  Sprites::drawOverwrite(8, 13, title, 0);
 
-  if (arduboy.justPressed(A_BUTTON)) {
+  tinyfont.setCursor(26, 34);
+  tinyfont.print("ANY KIND OF ANY");
+  tinyfont.setCursor(31, 40);
+  tinyfont.print("CAR AND TRUCK");
+
+  tinyfont.setCursor(20, 55);
+  tinyfont.print("for desi from dada");
+
+  if (arduboy.justPressed(A_BUTTON | B_BUTTON)) {
     gameStatus = GameStatus::Play;
   }
 }
