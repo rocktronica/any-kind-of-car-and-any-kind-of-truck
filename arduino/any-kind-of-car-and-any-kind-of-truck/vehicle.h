@@ -227,7 +227,7 @@ class Vehicle {
 
     uint8_t getWheelsDistance(bool randomize) {
       uint8_t max = box.width - wheelsXOffset - 1;
-      uint8_t min = wheels[0].radius * 2;
+      uint8_t min = wheels[0].radius * 2 + gutter;
 
       if (randomize) {
         return random(min, max + 1);
