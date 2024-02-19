@@ -130,12 +130,10 @@ class Vehicle {
       );
     }
 
-    void debug(Arduboy2 arduboy) {
-      arduboy.println("cabWidth: " + String(cab.width));
-      arduboy.println("cabWidth: " + String(cab.width));
-      arduboy.println("boxWidth: " + String(box.width));
-      arduboy.println("boxHeight: " + String(box.height));
-      arduboy.println("wheelRadius: " + String(wheels[0].radius));
+    String getDebugText() {
+      return "C:" + String(cab.width) + "x" + String(cab.height) + "\n" +
+        "B:" + String(box.width) + "x" + String(box.height) + "\n" +
+        "W:" + String(wheels[0].radius);
     }
 
     void draw(uint8_t x, uint8_t y, Arduboy2 arduboy) {
@@ -264,6 +262,8 @@ class Vehicle {
         arduboy
       );
     }
+
+    // TODO: side mirrors
 };
 
 #endif

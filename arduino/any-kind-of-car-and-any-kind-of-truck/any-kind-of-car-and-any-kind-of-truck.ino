@@ -48,7 +48,8 @@ void titleScreen() {
 
 void play() {
   if (DEBUG) {
-    vehicle.debug(arduboy);
+    tinyfont.setCursor(1, 1);
+    tinyfont.print(vehicle.getDebugText());
   }
 
   vehicle.draw(
