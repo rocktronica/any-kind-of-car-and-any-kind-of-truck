@@ -5,34 +5,33 @@
 
 // REMEMBER: display is 128x64
 
-// TODO: really, what's the smallest car?
-
-# define MIN_CAB_WIDTH        20
-# define MIN_CAB_HEIGHT       20
+# define MIN_CAB_WIDTH        13
+# define MIN_CAB_HEIGHT       6
 # define MAX_CAB_WIDTH        40
 # define MAX_CAB_HEIGHT       22
 
-# define MIN_BOX_WIDTH        35
-# define MIN_BOX_HEIGHT       10
+# define MIN_BOX_WIDTH        18
+# define MIN_BOX_HEIGHT       8
 # define MAX_BOX_WIDTH        80
 # define MAX_BOX_HEIGHT       22
 
 # define TRUNK_CHAMFER        3
 # define CAB_TOP_CHAMFER      3
-# define CAB_JOINT_CHAMFER    2
+# define CAB_JOINT_CHAMFER    1
 # define HOOD_CHAMFER         3
 
 # define WHEELS_SUSPENSION    0
-# define MIN_WHEEL_RADIUS     5
+# define MIN_WHEEL_RADIUS     3
 # define WHEEL_TREAD          5
 # define MAX_WHEEL_RADIUS     20
 # define MIN_WHEEL_X_OFFSET   0
 
-# define BUMPER_HEIGHT        MIN_BOX_HEIGHT - max(TRUNK_CHAMFER, HOOD_CHAMFER)
+# define MAX_BUMPER_HEIGHT    8
+# define MIN_BUMPER_HEIGHT    5
 # define BUMPER_WIDTH         3
 
 # define LIGHTS_WIDTH         2
-# define MIN_LIGHTS_HEIGHT    3
+# define MIN_LIGHTS_HEIGHT    4
 # define LIGHTS_BUMPER_GUTTER 1
 
 # define GUTTER               2
@@ -114,6 +113,21 @@ class Vehicle {
       cab.xOffset = 0;
     }
 
+    void minimize() {
+      update(
+        MIN_CAB_WIDTH,
+        MIN_CAB_HEIGHT,
+        MIN_BOX_WIDTH,
+        MIN_BOX_HEIGHT,
+        MIN_WHEEL_RADIUS,
+        true
+      );
+
+      wheelsXOffset = MIN_WHEEL_RADIUS + 1;
+      wheelsDistance = getMinWheelsDistance();
+      cab.xOffset = 2;
+    }
+
     void randomize() {
       // TODO: prefer "typical" shapes
       update(
@@ -176,7 +190,10 @@ class Vehicle {
     }
 
     uint8_t getBumperHeight() {
-      return min(BUMPER_HEIGHT, MIN_BOX_HEIGHT - getHoodChamfer());
+      return min(
+        max(0, box.height - getHoodChamfer() - LIGHTS_BUMPER_GUTTER - MIN_LIGHTS_HEIGHT),
+        MAX_BUMPER_HEIGHT
+      );
     }
 
     uint8_t getLightsHeight() {
@@ -230,9 +247,13 @@ class Vehicle {
       return min;
     }
 
+    uint8_t getMinWheelsDistance() {
+      return wheels[0].radius * 2 + gutter;
+    };
+
     uint8_t getWheelsDistance(bool randomize) {
       uint8_t max = box.width - wheelsXOffset - 1;
-      uint8_t min = wheels[0].radius * 2 + gutter;
+      uint8_t min = getMinWheelsDistance();
 
       if (randomize) {
         return random(min, max + 1);
@@ -264,25 +285,27 @@ class Vehicle {
       uint8_t bumperHeight = getBumperHeight();
       uint8_t lightsHeight = getLightsHeight();
 
-      // Left bumper
-      drawChamferedRectangle(
-        boxX - BUMPER_WIDTH,
-        boxY + box.height - bumperHeight,
-        BUMPER_WIDTH + 1,
-        bumperHeight,
-        2, 0, 0, 2,
-        arduboy
-      );
+      if (bumperHeight >= MIN_BUMPER_HEIGHT) {
+        // Left bumper
+        drawChamferedRectangle(
+          boxX - BUMPER_WIDTH,
+          boxY + box.height - bumperHeight,
+          BUMPER_WIDTH + 1,
+          bumperHeight,
+          2, 0, 0, 2,
+          arduboy
+        );
 
-      // Right bumper
-      drawChamferedRectangle(
-        boxX + box.width - 1,
-        boxY + box.height - bumperHeight,
-        BUMPER_WIDTH + 1,
-        bumperHeight,
-        0, 2, 2, 0,
-        arduboy
-      );
+        // Right bumper
+        drawChamferedRectangle(
+          boxX + box.width - 1,
+          boxY + box.height - bumperHeight,
+          BUMPER_WIDTH + 1,
+          bumperHeight,
+          0, 2, 2, 0,
+          arduboy
+        );
+      }
 
       // Front lights
       if (lightsHeight >= MIN_LIGHTS_HEIGHT) {
@@ -298,12 +321,14 @@ class Vehicle {
     }
 
     void drawDoors(uint8_t boxY, uint8_t cabX, int8_t doorX, Arduboy2 arduboy) {
-      uint8_t y = boxY + ((gutter * 2) + 1);
-      uint8_t height = box.height - ((gutter * 2) + 1) * 2;
+      uint8_t y = boxY + (gutter + 1);
+      uint8_t height = max(0, box.height - (gutter + 1) * 2);
 
-      arduboy.drawFastVLine(cabX, y, height);
-      arduboy.drawFastVLine(doorX, y, height);
-      arduboy.drawFastVLine(cabX + cab.width - 1, y, height);
+      if (height > 1) {
+        arduboy.drawFastVLine(cabX, y, height);
+        arduboy.drawFastVLine(doorX, y, height);
+        arduboy.drawFastVLine(cabX + cab.width - 1, y, height);
+      }
     }
 
     // TODO: side mirrors

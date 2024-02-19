@@ -24,7 +24,7 @@ void setup() {
   arduboy.boot(); // TODO: use .begin() for Arduboy splash
   arduboy.setFrameRate(15);
 
-  vehicle.randomize();
+  vehicle.minimize();
 
   arduboy.initRandomSeed();
   arduboy.invert(INVERT);
@@ -43,7 +43,7 @@ void titleScreen() {
 
   if (arduboy.justPressed(A_BUTTON | B_BUTTON)) {
     gameStatus = GameStatus::Play;
-    vehicle.randomize();
+    vehicle.minimize();
   }
 }
 
