@@ -1,4 +1,5 @@
 #include <Arduboy2.h>
+#include <ArduboyTones.h>
 #include <Tinyfont.h>
 #include "images.h"
 #include "utils.h"
@@ -10,6 +11,7 @@
 # define JUMP_FRAMES_MAX    2
 
 Arduboy2 arduboy;
+ArduboyTones sound(arduboy.audio.enabled);
 Tinyfont tinyfont = Tinyfont(arduboy.sBuffer, WIDTH, HEIGHT);
 
 Vehicle vehicle;
@@ -18,8 +20,28 @@ int8_t jumpFramesElapsed = JUMP_FRAMES_MAX;
 
 bool showTitleOverlay = true;
 
+const uint16_t themeTones[] PROGMEM = {
+ NOTE_C5,136, NOTE_C5,136, NOTE_C5,136, NOTE_C5,136, NOTE_G4,136, NOTE_REST,136, NOTE_G4,136, NOTE_E4,136,
+ NOTE_E4,136, NOTE_E4,136, NOTE_E4,136, NOTE_E4,136, NOTE_C4,136, NOTE_REST,136, NOTE_C4,136, NOTE_C4,136,
+ NOTE_C4,136, NOTE_C4,136, NOTE_C4,136, NOTE_C4,136, NOTE_D4,136, NOTE_REST,136, NOTE_C4,136, NOTE_REST,136,
+ NOTE_C4,136, NOTE_REST,272, NOTE_C4,68, NOTE_E4,68, NOTE_C5,136,
+
+ TONES_END
+};
+
+const uint16_t changeTones[] PROGMEM = {
+ NOTE_C4,68, NOTE_E4,68, NOTE_C5,136,
+ TONES_END
+};
+
+const uint16_t moveTones[] PROGMEM = {
+ NOTE_G3,34, NOTE_E3,34,
+ TONES_END
+};
+
 void setup() {
-  arduboy.boot(); // TODO: use .begin() for Arduboy splash
+  arduboy.beginDoFirst(); // TODO: use .begin() for Arduboy splash
+
   arduboy.setFrameRate(15);
 
   arduboy.initRandomSeed();
@@ -27,6 +49,8 @@ void setup() {
 
   vehicle.baby();
   vehicleX = (WIDTH - vehicle.getWidth()) / 2;
+
+  sound.tones(themeTones);
 }
 
 void titleOverlay() {
@@ -70,20 +94,30 @@ void play() {
 
   if (arduboy.justPressed(A_BUTTON)) {
       showTitleOverlay = !showTitleOverlay;
+
+      if (showTitleOverlay) {
+        sound.tones(themeTones);
+      } else {
+        sound.noTone();
+      }
   }
 
   if (arduboy.pressed(B_BUTTON) && arduboy.notPressed(A_BUTTON)) {
       uint8_t previousWidth = vehicle.getWidth();
       vehicle.randomize();
       vehicleX = vehicle.getProperlyExposedXAgainstPreviousWidth(vehicleX, previousWidth);
+
+      sound.tones(changeTones);
   }
 
   if (arduboy.pressed(LEFT_BUTTON)) {
     vehicleX = vehicle.getProperlyExposedX(vehicleX - VEHICLE_TRAVEL);
+    sound.tones(moveTones);
   }
 
   if (arduboy.pressed(RIGHT_BUTTON)) {
     vehicleX = vehicle.getProperlyExposedX(vehicleX + VEHICLE_TRAVEL);
+    sound.tones(moveTones);
   }
 
   if (arduboy.pressed(A_BUTTON | B_BUTTON)) {
