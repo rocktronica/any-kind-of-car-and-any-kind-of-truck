@@ -145,10 +145,12 @@ class Vehicle {
       uint8_t cabY = y;
       uint8_t boxX = x;
       uint8_t boxY = y + cab.height;
+      uint8_t doorX = cabX + cab.width * .4; // TODO: arbitrary
 
       drawOutline(cabX, cabY, boxX, boxY, arduboy);
-      drawWindows(cabX, cabY, arduboy);
+      drawWindows(cabX, cabY, doorX, arduboy);
       drawBumpersAndLights(boxX, boxY, arduboy);
+      drawDoors(boxY, cabX, doorX, arduboy);
 
       uint8_t wheelsX[2] = {wheelsXOffset, wheelsXOffset + wheelsDistance};
       for (uint8_t i = 0; i < 2; i++) {
@@ -162,6 +164,7 @@ class Vehicle {
 
   private:
     uint8_t minWheelXOffset = 0;
+    uint8_t gutter = 2;
 
     uint8_t getHoodChamfer() {
       return min(HOOD_CHAMFER, box.width - cab.xOffset - cab.width);
@@ -233,9 +236,7 @@ class Vehicle {
       return max;
     };
 
-    void drawWindows(uint8_t cabX, uint8_t cabY, Arduboy2 arduboy) {
-      uint8_t gutter = 2;
-
+    void drawWindows(uint8_t cabX, uint8_t cabY, uint8_t doorX, Arduboy2 arduboy) {
       uint8_t height = cab.height - gutter;
 
       drawChamferedRectangle(
@@ -247,9 +248,8 @@ class Vehicle {
         arduboy
       );
 
-      // TODO: arbitrary split placement
       arduboy.drawFastVLine(
-        cabX + (gutter + 1) + (cab.width - (gutter + 1) * 2) * .4,
+        doorX,
         cabY + (gutter + 1),
         cab.height - 2
       );
@@ -291,6 +291,15 @@ class Vehicle {
           arduboy
         );
       }
+    }
+
+    void drawDoors(uint8_t boxY, uint8_t cabX, int8_t doorX, Arduboy2 arduboy) {
+      uint8_t y = boxY + ((gutter * 2) + 1);
+      uint8_t height = box.height - ((gutter * 2) + 1) * 2;
+
+      arduboy.drawFastVLine(cabX, y, height);
+      arduboy.drawFastVLine(doorX, y, height);
+      arduboy.drawFastVLine(cabX + cab.width - 1, y, height);
     }
 
     // TODO: side mirrors
