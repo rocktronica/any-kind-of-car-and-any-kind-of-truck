@@ -244,7 +244,7 @@ class Vehicle {
         cabY + (gutter + 1),
         cab.width - (gutter + 1) * 2,
         height,
-        CAB_TOP_CHAMFER - gutter, CAB_TOP_CHAMFER - gutter, 0, 0,
+        max(0, CAB_TOP_CHAMFER - gutter), max(0, CAB_TOP_CHAMFER - gutter), 0, 0,
         arduboy
       );
 
