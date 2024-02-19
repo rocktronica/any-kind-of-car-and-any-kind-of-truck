@@ -21,11 +21,15 @@ function help() {
 CLI wrapper around Arduino and Ardens
 
 Usage:
-./run.sh -h         Show help and exit
+./run.sh -h                 Show help and exit
 
-./run.sh dev        Compile and emuluate
-                    Looped! Quit emulator to refresh
-./run.sh deploy     Compile and upload
+./run.sh dev                Compile and emuluate
+                            Looped! Quit emulator to refresh
+./run.sh deploy             Compile and upload
+                            Default port: $port
+./run.sh deploy -p PORT     ^ with arbitrary port
+                            Run 'arduino-cli board list' for list
+
 "
 }
 
@@ -73,6 +77,10 @@ if [ "$1" == 'dev' ]; then
 fi
 
 if [ "$1" == 'deploy' ]; then
+    if [ "$2" == '-p' ]; then
+        port="$3"
+    fi
+
     compile
     upload
 
