@@ -22,7 +22,7 @@
 # define CAB_JOINT_CHAMFER    2
 # define HOOD_CHAMFER         3
 
-// TODO: suspension
+# define WHEELS_SUSPENSION    0
 # define MIN_WHEEL_RADIUS     5
 # define MAX_WHEEL_RADIUS     20
 
@@ -73,7 +73,7 @@ class Vehicle {
     uint8_t wheelsXOffset;
 
     uint8_t getHeight() {
-      return cab.height + box.height + wheels[0].radius + 1;
+      return cab.height + box.height + WHEELS_SUSPENSION + wheels[0].radius + 1;
     }
 
     uint8_t getWidth() {
@@ -156,7 +156,7 @@ class Vehicle {
       for (uint8_t i = 0; i < 2; i++) {
         wheels[i].draw(
           x + wheelsX[i],
-          y + cab.height + box.height,
+          y + WHEELS_SUSPENSION + cab.height - 1 + box.height,
           arduboy
         );
       }
