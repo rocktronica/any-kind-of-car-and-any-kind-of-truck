@@ -7,27 +7,31 @@
 
 // TODO: really, what's the smallest car?
 
-# define MIN_CAB_WIDTH      20
-# define MIN_CAB_HEIGHT     20
-# define MAX_CAB_WIDTH      50
-# define MAX_CAB_HEIGHT     22
+# define MIN_CAB_WIDTH        20
+# define MIN_CAB_HEIGHT       20
+# define MAX_CAB_WIDTH        40
+# define MAX_CAB_HEIGHT       22
 
-# define MIN_BOX_WIDTH      30
-# define MIN_BOX_HEIGHT     10
-# define MAX_BOX_WIDTH      80
-# define MAX_BOX_HEIGHT     22
+# define MIN_BOX_WIDTH        35
+# define MIN_BOX_HEIGHT       10
+# define MAX_BOX_WIDTH        80
+# define MAX_BOX_HEIGHT       22
 
-# define TRUNK_CHAMFER      3
-# define CAB_TOP_CHAMFER    3
-# define CAB_JOINT_CHAMFER  2
-# define HOOD_CHAMFER       3
+# define TRUNK_CHAMFER        3
+# define CAB_TOP_CHAMFER      3
+# define CAB_JOINT_CHAMFER    2
+# define HOOD_CHAMFER         3
 
 // TODO: suspension
-# define MIN_WHEEL_RADIUS   5
-# define MAX_WHEEL_RADIUS   20
+# define MIN_WHEEL_RADIUS     5
+# define MAX_WHEEL_RADIUS     20
 
-# define BUMPER_HEIGHT      MIN_BOX_HEIGHT - max(TRUNK_CHAMFER, HOOD_CHAMFER)
-# define BUMPER_WIDTH       2
+# define BUMPER_HEIGHT        MIN_BOX_HEIGHT - max(TRUNK_CHAMFER, HOOD_CHAMFER)
+# define BUMPER_WIDTH         3
+
+# define LIGHTS_WIDTH         2
+# define MIN_LIGHTS_HEIGHT    3
+# define LIGHTS_BUMPER_GUTTER 1
 
 struct Cab {
   uint8_t width;
@@ -144,7 +148,7 @@ class Vehicle {
 
       drawOutline(cabX, cabY, boxX, boxY, arduboy);
       drawWindows(cabX, cabY, arduboy);
-      drawBumpers(boxX, boxY, arduboy);
+      drawBumpersAndLights(boxX, boxY, arduboy);
 
       uint8_t wheelsX[2] = {wheelsXOffset, wheelsXOffset + wheelsDistance};
       for (uint8_t i = 0; i < 2; i++) {
@@ -159,6 +163,19 @@ class Vehicle {
   private:
     uint8_t minWheelXOffset = 0;
 
+    uint8_t getHoodChamfer() {
+      return min(HOOD_CHAMFER, box.width - cab.xOffset - cab.width);
+    }
+
+    uint8_t getBumperHeight() {
+      return min(BUMPER_HEIGHT, MIN_BOX_HEIGHT - getHoodChamfer());
+    }
+
+    uint8_t getLightsHeight() {
+      // TODO: fix this sometimes being 255 somehow
+      return max(0, box.height - getHoodChamfer() - getBumperHeight() - LIGHTS_BUMPER_GUTTER);
+    }
+
     void drawOutline(
       uint8_t cabX,
       uint8_t cabY,
@@ -168,7 +185,7 @@ class Vehicle {
       Arduboy2 arduboy
     ) {
       uint8_t trunk_chamfer = min(TRUNK_CHAMFER, cab.xOffset);
-      uint8_t hood_chamfer = min(HOOD_CHAMFER, box.width - cab.xOffset - cab.width);
+      uint8_t hood_chamfer = getHoodChamfer();
 
       uint8_t cab_back_joint_chamfer = min(CAB_JOINT_CHAMFER, cab.xOffset - trunk_chamfer);
       uint8_t cab_front_joint_chamfer =
@@ -238,29 +255,42 @@ class Vehicle {
       );
     }
 
-    void drawBumpers(int8_t boxX, uint8_t boxY, Arduboy2 arduboy) {
-      uint8_t height = min(BUMPER_HEIGHT, MIN_BOX_HEIGHT);
-      uint8_t width = BUMPER_WIDTH + 1;
+    void drawBumpersAndLights(int8_t boxX, uint8_t boxY, Arduboy2 arduboy) {
+      uint8_t bumper_height = getBumperHeight();
+      uint8_t lights_y = boxY + getHoodChamfer();
+      uint8_t lights_height = getLightsHeight();
 
-      // Left
+      // Left bumper
       drawChamferedRectangle(
-        boxX - width + 1,
-        boxY + box.height - height,
-        width,
-        height,
+        boxX - BUMPER_WIDTH,
+        boxY + box.height - bumper_height,
+        BUMPER_WIDTH + 1,
+        bumper_height,
         2, 0, 0, 2,
         arduboy
       );
 
-      // Right
+      // Right bumper
       drawChamferedRectangle(
         boxX + box.width - 1,
-        boxY + box.height - height,
-        width,
-        height,
+        boxY + box.height - bumper_height,
+        BUMPER_WIDTH + 1,
+        bumper_height,
         0, 2, 2, 0,
         arduboy
       );
+
+      // Front lights
+      if (lights_height >= MIN_LIGHTS_HEIGHT) {
+        drawChamferedRectangle(
+          boxX + box.width - 1,
+          lights_y,
+          LIGHTS_WIDTH + 1,
+          lights_height,
+          0, 1, 1, 0,
+          arduboy
+        );
+      }
     }
 
     // TODO: side mirrors
