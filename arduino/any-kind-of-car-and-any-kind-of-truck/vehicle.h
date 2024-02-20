@@ -143,9 +143,9 @@ class Vehicle {
 
     void draw(uint8_t x, uint8_t y, Arduboy2 arduboy) {
       uint8_t cabX = x + cab.xOffset;
-      uint8_t cabY = y;
+      uint8_t cabY = bounce + y;
       uint8_t boxX = x;
-      uint8_t boxY = y + cab.height;
+      uint8_t boxY = bounce + y + cab.height;
       uint8_t doorX = cabX + cab.width * .4; // TODO: arbitrary
 
       drawOutline(cabX, cabY, boxX, boxY, arduboy);
@@ -161,11 +161,15 @@ class Vehicle {
           arduboy
         );
       }
+
+      bounce = (bounce - 1) % 2;
     }
 
   private:
     uint8_t minWheelXOffset = MIN_WHEEL_X_OFFSET;
     uint8_t gutter = GUTTER;
+
+    uint8_t bounce = 0;
 
     uint8_t getHoodChamfer() {
       return min(HOOD_CHAMFER, box.width - cab.xOffset - cab.width);
