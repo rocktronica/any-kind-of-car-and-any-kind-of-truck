@@ -24,26 +24,34 @@ void setup() {
   arduboy.boot(); // TODO: use .begin() for Arduboy splash
   arduboy.setFrameRate(15);
 
-  vehicle.minimize();
-
   arduboy.initRandomSeed();
   arduboy.invert(INVERT);
 }
 
 void titleScreen() {
-  Sprites::drawOverwrite(8, 13, title, 0);
+  Sprites::drawOverwrite(8, 8, title, 0);
 
-  tinyfont.setCursor(26, 34);
+  tinyfont.setCursor(26, 30);
   tinyfont.print("ANY KIND OF ANY");
-  tinyfont.setCursor(31, 40);
+  tinyfont.setCursor(31, 36);
   tinyfont.print("CAR AND TRUCK");
 
-  tinyfont.setCursor(20, 55);
-  tinyfont.print("for desi from dada");
+  tinyfont.setCursor(3, 57);
+  tinyfont.print("2024");
+  tinyfont.setCursor(83, 52);
+  tinyfont.print(" for desi");
+  tinyfont.setCursor(83, 57);
+  tinyfont.print("from dada");
+
+  vehicle.minimize();
+  vehicle.draw(
+    (WIDTH - vehicle.getWidth()) / 2,
+    GROUND_Y + 1 - vehicle.getHeight(),
+    arduboy
+  );
 
   if (arduboy.justPressed(A_BUTTON | B_BUTTON)) {
     gameStatus = GameStatus::Play;
-    vehicle.minimize();
   }
 }
 
@@ -58,8 +66,6 @@ void play() {
     GROUND_Y + 1 - vehicle.getHeight(),
     arduboy
   );
-
-  arduboy.drawFastHLine(0, GROUND_Y, WIDTH);
 
   if (arduboy.justPressed(A_BUTTON)) {
       gameStatus = GameStatus::TitleScreen;
@@ -77,6 +83,8 @@ void loop() {
 
   arduboy.pollButtons();
   arduboy.clear();
+
+  arduboy.drawFastHLine(0, GROUND_Y, WIDTH);
 
   switch (gameStatus) {
     case GameStatus::TitleScreen:
