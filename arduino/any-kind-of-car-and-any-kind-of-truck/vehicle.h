@@ -187,29 +187,29 @@ class Vehicle {
 
       Arduboy2 arduboy
     ) {
-      uint8_t trunk_chamfer = min(TRUNK_CHAMFER, cab.xOffset);
-      uint8_t hood_chamfer = getHoodChamfer();
+      uint8_t trunkChamfer = min(TRUNK_CHAMFER, cab.xOffset);
+      uint8_t hoodChamfer = getHoodChamfer();
 
-      uint8_t cab_back_joint_chamfer = min(CAB_JOINT_CHAMFER, cab.xOffset - trunk_chamfer);
-      uint8_t cab_front_joint_chamfer =
-        min(CAB_JOINT_CHAMFER, box.width - cab.xOffset - cab.width - hood_chamfer);
+      uint8_t cabBackJointChamfer = min(CAB_JOINT_CHAMFER, cab.xOffset - trunkChamfer);
+      uint8_t cabFrontJointChamfer =
+        min(CAB_JOINT_CHAMFER, box.width - cab.xOffset - cab.width - hoodChamfer);
 
       // Clockwise from top left of box
       Xy points[14] = {
-        {boxX + trunk_chamfer, boxY},
-        {cabX - cab_back_joint_chamfer, boxY},
-        {cabX, boxY - cab_back_joint_chamfer},
+        {boxX + trunkChamfer, boxY},
+        {cabX - cabBackJointChamfer, boxY},
+        {cabX, boxY - cabBackJointChamfer},
         {cabX, cabY + CAB_TOP_CHAMFER},
         {cabX + CAB_TOP_CHAMFER, cabY},
         {cabX + cab.width - 1 - CAB_TOP_CHAMFER, cabY},
         {cabX + cab.width - 1, cabY + CAB_TOP_CHAMFER},
-        {cabX + cab.width - 1, boxY - cab_front_joint_chamfer},
-        {cabX + cab.width - 1 + cab_front_joint_chamfer, boxY},
-        {boxX + box.width - 1 - hood_chamfer, boxY},
-        {boxX + box.width - 1, boxY + hood_chamfer},
+        {cabX + cab.width - 1, boxY - cabFrontJointChamfer},
+        {cabX + cab.width - 1 + cabFrontJointChamfer, boxY},
+        {boxX + box.width - 1 - hoodChamfer, boxY},
+        {boxX + box.width - 1, boxY + hoodChamfer},
         {boxX + box.width - 1, boxY + box.height - 1},
         {boxX, boxY + box.height - 1},
-        {boxX, boxY + trunk_chamfer},
+        {boxX, boxY + trunkChamfer},
       };
       drawPolygon(points, 14, arduboy);
     }
@@ -256,16 +256,15 @@ class Vehicle {
     }
 
     void drawBumpersAndLights(int8_t boxX, uint8_t boxY, Arduboy2 arduboy) {
-      uint8_t bumper_height = getBumperHeight();
-      uint8_t lights_y = boxY + getHoodChamfer();
-      uint8_t lights_height = getLightsHeight();
+      uint8_t bumperHeight = getBumperHeight();
+      uint8_t lightsHeight = getLightsHeight();
 
       // Left bumper
       drawChamferedRectangle(
         boxX - BUMPER_WIDTH,
-        boxY + box.height - bumper_height,
+        boxY + box.height - bumperHeight,
         BUMPER_WIDTH + 1,
-        bumper_height,
+        bumperHeight,
         2, 0, 0, 2,
         arduboy
       );
@@ -273,20 +272,20 @@ class Vehicle {
       // Right bumper
       drawChamferedRectangle(
         boxX + box.width - 1,
-        boxY + box.height - bumper_height,
+        boxY + box.height - bumperHeight,
         BUMPER_WIDTH + 1,
-        bumper_height,
+        bumperHeight,
         0, 2, 2, 0,
         arduboy
       );
 
       // Front lights
-      if (lights_height >= MIN_LIGHTS_HEIGHT) {
+      if (lightsHeight >= MIN_LIGHTS_HEIGHT) {
         drawChamferedRectangle(
           boxX + box.width - 1,
-          lights_y,
+          boxY + getHoodChamfer(),
           LIGHTS_WIDTH + 1,
-          lights_height,
+          lightsHeight,
           0, 1, 1, 0,
           arduboy
         );
