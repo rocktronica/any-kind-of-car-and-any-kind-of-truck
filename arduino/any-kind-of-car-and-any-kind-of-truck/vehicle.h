@@ -24,7 +24,9 @@
 
 # define WHEELS_SUSPENSION    0
 # define MIN_WHEEL_RADIUS     5
+# define WHEEL_TREAD          5
 # define MAX_WHEEL_RADIUS     20
+# define MIN_WHEEL_X_OFFSET   0
 
 # define BUMPER_HEIGHT        MIN_BOX_HEIGHT - max(TRUNK_CHAMFER, HOOD_CHAMFER)
 # define BUMPER_WIDTH         3
@@ -32,6 +34,8 @@
 # define LIGHTS_WIDTH         2
 # define MIN_LIGHTS_HEIGHT    3
 # define LIGHTS_BUMPER_GUTTER 1
+
+# define GUTTER               2
 
 struct Cab {
   uint8_t width;
@@ -56,11 +60,8 @@ class Wheel {
       arduboy.drawCircle(x, y, radius, WHITE);
       arduboy.fillCircle(x, y, radius - 1, BLACK);
 
-      arduboy.drawCircle(x, y, max(0, radius - tread));
+      arduboy.drawCircle(x, y, max(0, radius - WHEEL_TREAD));
     }
-
-  private:
-    uint8_t tread = 5;
 };
 
 class Vehicle {
@@ -70,7 +71,7 @@ class Vehicle {
     Wheel wheels[2];
 
     uint8_t wheelsDistance;
-    uint8_t wheelsXOffset;
+    uint8_t wheelsXOffset = MIN_WHEEL_X_OFFSET;
 
     uint8_t getHeight() {
       return cab.height + box.height + WHEELS_SUSPENSION + wheels[0].radius + 1;
@@ -163,8 +164,8 @@ class Vehicle {
     }
 
   private:
-    uint8_t minWheelXOffset = 0;
-    uint8_t gutter = 2;
+    uint8_t minWheelXOffset = MIN_WHEEL_X_OFFSET;
+    uint8_t gutter = GUTTER;
 
     uint8_t getHoodChamfer() {
       return min(HOOD_CHAMFER, box.width - cab.xOffset - cab.width);
