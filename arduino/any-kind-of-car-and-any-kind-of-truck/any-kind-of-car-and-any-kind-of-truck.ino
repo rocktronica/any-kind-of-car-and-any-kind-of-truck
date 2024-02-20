@@ -38,12 +38,12 @@ void titleScreen() {
   tinyfont.setCursor(31, 36);
   tinyfont.print("CAR AND TRUCK");
 
-  tinyfont.setCursor(3, 57);
+  tinyfont.setCursor(2, 57);
   tinyfont.print("2024");
-  tinyfont.setCursor(83, 52);
-  tinyfont.print(" for desi");
-  tinyfont.setCursor(83, 57);
-  tinyfont.print("from dada");
+  tinyfont.setCursor(88, 52);
+  tinyfont.print("for:desi");
+  tinyfont.setCursor(88, 57);
+  tinyfont.print("luv:dada");
 
   vehicle.minimize();
   vehicleX = (WIDTH - vehicle.getWidth()) / 2;
