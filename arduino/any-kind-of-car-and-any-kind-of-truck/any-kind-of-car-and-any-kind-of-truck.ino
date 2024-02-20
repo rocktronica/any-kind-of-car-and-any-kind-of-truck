@@ -6,6 +6,7 @@
 
 # define INVERT             false
 # define DEBUG              false
+# define GROUND_Y           HEIGHT - 1
 
 enum class GameStatus : uint8_t {
   TitleScreen,
@@ -54,9 +55,11 @@ void play() {
 
   vehicle.draw(
     (WIDTH - vehicle.getWidth()) / 2,
-    (HEIGHT - vehicle.getHeight()) / 2,
+    GROUND_Y + 1 - vehicle.getHeight(),
     arduboy
   );
+
+  arduboy.drawFastHLine(0, GROUND_Y, WIDTH);
 
   if (arduboy.justPressed(A_BUTTON)) {
       gameStatus = GameStatus::TitleScreen;
