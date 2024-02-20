@@ -351,4 +351,11 @@ class Vehicle {
     // TODO: side mirrors
 };
 
+int16_t getProperlyExposedX(int16_t x, uint8_t vehicleWidth) {
+    return min(
+      max(x, -vehicleWidth + MIN_X_EXPOSURE),
+      WIDTH - MIN_X_EXPOSURE
+    );
+}
+
 #endif

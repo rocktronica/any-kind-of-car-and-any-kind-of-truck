@@ -82,16 +82,21 @@ void play() {
 
   if (arduboy.pressed(B_BUTTON)) {
       uint8_t previousWidth = vehicle.getWidth();
+
       vehicle.randomize();
-      vehicleX = vehicleX + (previousWidth - vehicle.getWidth()) / 2;
+
+      vehicleX = getProperlyExposedX(
+        vehicleX + (previousWidth - vehicle.getWidth()) / 2,
+        vehicle.getWidth()
+      );
   }
 
   if (arduboy.pressed(LEFT_BUTTON)) {
-    vehicleX = max(vehicleX - VEHICLE_TRAVEL, vehicle.getWidth() * -1 + MIN_X_EXPOSURE);
+    vehicleX = getProperlyExposedX(vehicleX - VEHICLE_TRAVEL, vehicle.getWidth());
   }
 
   if (arduboy.pressed(RIGHT_BUTTON)) {
-    vehicleX = min(vehicleX + VEHICLE_TRAVEL, WIDTH - MIN_X_EXPOSURE);
+    vehicleX = getProperlyExposedX(vehicleX + VEHICLE_TRAVEL, vehicle.getWidth());
   }
 }
 
