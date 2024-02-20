@@ -41,10 +41,16 @@ fi
 function compile() {
     mkdir -pv "$build_path" >/dev/null
 
+    echo "COMPILING"
+    echo
+
     arduino-cli compile \
         --fqbn "$fbqn" \
         --build-path="$build_path" \
+        --verbose \
         "$input_path"
+
+    echo
 }
 
 function emulate() {
@@ -52,10 +58,16 @@ function emulate() {
 }
 
 function upload() {
+    echo "UPLOADING"
+    echo
+
     arduino-cli upload \
         --fqbn "$fbqn" \
         --port "$port" \
+        --verbose \
         --input-file "$build_path/$stub.ino.hex"
+
+    echo
 }
 
 if [ "$1" == '-h' ]; then
