@@ -36,6 +36,10 @@
 
 # define GUTTER               2
 
+# define VEHICLE_TRAVEL       5
+# define VEHICLE_JUMP         10
+# define MIN_X_EXPOSURE       10
+
 struct Cab {
   uint8_t width;
   uint8_t height;
@@ -55,7 +59,7 @@ class Wheel {
       radius = _radius;
     }
 
-    void draw(uint8_t x, uint8_t y, Arduboy2 arduboy) {
+    void draw(int16_t x, int16_t y, Arduboy2 arduboy) {
       arduboy.drawCircle(x, y, radius, WHITE);
       arduboy.fillCircle(x, y, radius - 1, BLACK);
 
@@ -155,23 +159,34 @@ class Vehicle {
         "W:" + String(wheels[0].radius);
     }
 
-    void draw(uint8_t x, uint8_t y, Arduboy2 arduboy) {
-      uint8_t cabX = x + cab.xOffset;
-      uint8_t cabY = bounce + y;
-      uint8_t boxX = x;
-      uint8_t boxY = bounce + y + cab.height;
-      uint8_t doorX = cabX + cab.width * .4; // TODO: arbitrary
+    uint8_t getCrouchDistance() {
+      return wheels[0].radius;
+    }
+
+    void setCrouchAndJump(int8_t _crouch, int8_t _jump) {
+      crouch = _crouch;
+      jump = _jump;
+    }
+
+    void draw(int16_t x, int16_t y, Arduboy2 arduboy) {
+      int8_t bodyLift = bounce + crouch - jump;
+
+      int16_t cabX = x + cab.xOffset;
+      int16_t cabY = bodyLift + y;
+      int16_t boxX = x;
+      int16_t boxY = bodyLift + y + cab.height;
+      int16_t doorX = cabX + cab.width * .4; // TODO: arbitrary
 
       drawOutline(cabX, cabY, boxX, boxY, arduboy);
       drawWindows(cabX, cabY, doorX, arduboy);
       drawBumpersAndLights(boxX, boxY, arduboy);
       drawDoors(boxY, cabX, doorX, arduboy);
 
-      uint8_t wheelsX[2] = {wheelsXOffset, wheelsXOffset + wheelsDistance};
+      int16_t wheelsX[2] = {wheelsXOffset, wheelsXOffset + wheelsDistance};
       for (uint8_t i = 0; i < 2; i++) {
         wheels[i].draw(
           x + wheelsX[i],
-          y + WHEELS_SUSPENSION + cab.height - 1 + box.height,
+          y + WHEELS_SUSPENSION + cab.height - 1 + box.height - jump,
           arduboy
         );
       }
@@ -183,7 +198,9 @@ class Vehicle {
     uint8_t minWheelXOffset = MIN_WHEEL_X_OFFSET;
     uint8_t gutter = GUTTER;
 
-    uint8_t bounce = 0;
+    int8_t bounce = 0; // TODO: distinguish from jump. jitter?
+    int8_t crouch = 0;
+    int8_t jump = 0;
 
     uint8_t getHoodChamfer() {
       return min(HOOD_CHAMFER, box.width - cab.xOffset - cab.width);
@@ -202,10 +219,10 @@ class Vehicle {
     }
 
     void drawOutline(
-      uint8_t cabX,
-      uint8_t cabY,
-      uint8_t boxX,
-      uint8_t boxY,
+      int16_t cabX,
+      int16_t cabY,
+      int16_t boxX,
+      int16_t boxY,
 
       Arduboy2 arduboy
     ) {
@@ -262,7 +279,7 @@ class Vehicle {
       return max;
     };
 
-    void drawWindows(uint8_t cabX, uint8_t cabY, uint8_t doorX, Arduboy2 arduboy) {
+    void drawWindows(int16_t cabX, int16_t cabY, int16_t doorX, Arduboy2 arduboy) {
       uint8_t height = cab.height - gutter;
 
       drawChamferedRectangle(
@@ -281,7 +298,7 @@ class Vehicle {
       );
     }
 
-    void drawBumpersAndLights(int8_t boxX, uint8_t boxY, Arduboy2 arduboy) {
+    void drawBumpersAndLights(int16_t boxX, int16_t boxY, Arduboy2 arduboy) {
       uint8_t bumperHeight = getBumperHeight();
       uint8_t lightsHeight = getLightsHeight();
 
@@ -320,8 +337,8 @@ class Vehicle {
       }
     }
 
-    void drawDoors(uint8_t boxY, uint8_t cabX, int8_t doorX, Arduboy2 arduboy) {
-      uint8_t y = boxY + (gutter + 1);
+    void drawDoors(int16_t boxY, int16_t cabX, int16_t doorX, Arduboy2 arduboy) {
+      int16_t y = boxY + (gutter + 1);
       uint8_t height = max(0, box.height - (gutter + 1) * 2);
 
       if (height > 1) {

@@ -19,6 +19,7 @@ Tinyfont tinyfont = Tinyfont(arduboy.sBuffer, WIDTH, HEIGHT);
 GameStatus gameStatus = GameStatus::TitleScreen;
 
 Vehicle vehicle;
+int16_t vehicleX = 0;
 
 void setup() {
   arduboy.boot(); // TODO: use .begin() for Arduboy splash
@@ -28,6 +29,7 @@ void setup() {
   arduboy.invert(INVERT);
 }
 
+// TODO: try as overlay on top of play
 void titleScreen() {
   Sprites::drawOverwrite(8, 8, title, 0);
 
@@ -44,13 +46,15 @@ void titleScreen() {
   tinyfont.print("from dada");
 
   vehicle.minimize();
+  vehicleX = (WIDTH - vehicle.getWidth()) / 2;
+
   vehicle.draw(
-    (WIDTH - vehicle.getWidth()) / 2,
+    vehicleX,
     GROUND_Y + 1 - vehicle.getHeight(),
     arduboy
   );
 
-  if (arduboy.justPressed(A_BUTTON | B_BUTTON)) {
+  if (arduboy.justPressed(A_BUTTON | B_BUTTON | UP_BUTTON | RIGHT_BUTTON | DOWN_BUTTON | LEFT_BUTTON)) {
     gameStatus = GameStatus::Play;
   }
 }
@@ -61,8 +65,13 @@ void play() {
     tinyfont.print(vehicle.getDebugText());
   }
 
+  vehicle.setCrouchAndJump(
+    arduboy.pressed(DOWN_BUTTON) ? vehicle.getCrouchDistance() : 0,
+    arduboy.pressed(UP_BUTTON) ? VEHICLE_JUMP : 0
+  );
+
   vehicle.draw(
-    (WIDTH - vehicle.getWidth()) / 2,
+    vehicleX,
     GROUND_Y + 1 - vehicle.getHeight(),
     arduboy
   );
@@ -72,7 +81,17 @@ void play() {
   }
 
   if (arduboy.pressed(B_BUTTON)) {
+      uint8_t previousWidth = vehicle.getWidth();
       vehicle.randomize();
+      vehicleX = vehicleX + (previousWidth - vehicle.getWidth()) / 2;
+  }
+
+  if (arduboy.pressed(LEFT_BUTTON)) {
+    vehicleX = max(vehicleX - VEHICLE_TRAVEL, vehicle.getWidth() * -1 + MIN_X_EXPOSURE);
+  }
+
+  if (arduboy.pressed(RIGHT_BUTTON)) {
+    vehicleX = min(vehicleX + VEHICLE_TRAVEL, WIDTH - MIN_X_EXPOSURE);
   }
 }
 
