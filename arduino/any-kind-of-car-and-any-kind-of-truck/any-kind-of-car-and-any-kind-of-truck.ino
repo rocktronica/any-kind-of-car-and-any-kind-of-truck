@@ -8,18 +8,13 @@
 # define DEBUG              false
 # define GROUND_Y           HEIGHT - 1
 
-enum class GameStatus : uint8_t {
-  TitleScreen,
-  Play,
-};
-
 Arduboy2 arduboy;
 Tinyfont tinyfont = Tinyfont(arduboy.sBuffer, WIDTH, HEIGHT);
 
-GameStatus gameStatus = GameStatus::TitleScreen;
-
 Vehicle vehicle;
 int16_t vehicleX = 0;
+
+bool showTitleOverlay = true;
 
 void setup() {
   arduboy.boot(); // TODO: use .begin() for Arduboy splash
@@ -27,11 +22,13 @@ void setup() {
 
   arduboy.initRandomSeed();
   arduboy.invert(INVERT);
+
+  vehicle.baby();
+  vehicleX = (WIDTH - vehicle.getWidth()) / 2;
 }
 
-// TODO: try as overlay on top of play
-void titleScreen() {
-  Sprites::drawOverwrite(8, 8, title, 0);
+void titleOverlay() {
+  Sprites::drawSelfMasked(8, 8, title, 0);
 
   tinyfont.setCursor(26, 30);
   tinyfont.print("ANY KIND OF ANY");
@@ -44,19 +41,6 @@ void titleScreen() {
   tinyfont.print("for:desi");
   tinyfont.setCursor(88, 57);
   tinyfont.print("luv:dada");
-
-  vehicle.baby();
-  vehicleX = (WIDTH - vehicle.getWidth()) / 2;
-
-  vehicle.draw(
-    vehicleX,
-    GROUND_Y + 1 - vehicle.getHeight(),
-    arduboy
-  );
-
-  if (arduboy.justPressed(A_BUTTON | B_BUTTON | UP_BUTTON | RIGHT_BUTTON | DOWN_BUTTON | LEFT_BUTTON)) {
-    gameStatus = GameStatus::Play;
-  }
 }
 
 void play() {
@@ -77,7 +61,7 @@ void play() {
   );
 
   if (arduboy.justPressed(A_BUTTON)) {
-      gameStatus = GameStatus::TitleScreen;
+      showTitleOverlay = !showTitleOverlay;
   }
 
   if (arduboy.pressed(B_BUTTON)) {
@@ -110,13 +94,10 @@ void loop() {
 
   arduboy.drawFastHLine(0, GROUND_Y, WIDTH);
 
-  switch (gameStatus) {
-    case GameStatus::TitleScreen:
-      titleScreen();
-      break;
-    case GameStatus::Play:
-      play();
-      break;
+  play();
+
+  if (showTitleOverlay) {
+    titleOverlay();
   }
 
   arduboy.display();
