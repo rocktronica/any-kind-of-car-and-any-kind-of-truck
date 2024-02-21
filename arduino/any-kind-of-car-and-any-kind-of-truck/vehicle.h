@@ -8,12 +8,12 @@
 # define MIN_CAB_WIDTH        13
 # define MIN_CAB_HEIGHT       6
 # define MAX_CAB_WIDTH        40
-# define MAX_CAB_HEIGHT       22
+# define MAX_CAB_HEIGHT       25
 
 # define MIN_BOX_WIDTH        18
 # define MIN_BOX_HEIGHT       8
-# define MAX_BOX_WIDTH        80
-# define MAX_BOX_HEIGHT       22
+# define MAX_BOX_WIDTH        100
+# define MAX_BOX_HEIGHT       35
 
 # define TRUNK_CHAMFER        3
 # define CAB_TOP_CHAMFER      3
@@ -21,9 +21,9 @@
 # define HOOD_CHAMFER         3
 
 # define WHEELS_SUSPENSION    0
-# define MIN_WHEEL_RADIUS     3
 # define WHEEL_TREAD          5
-# define MAX_WHEEL_RADIUS     20
+# define MIN_WHEEL_RADIUS     3
+# define MAX_WHEEL_RADIUS     25
 # define MIN_WHEEL_X_OFFSET   0
 
 # define MAX_BUMPER_HEIGHT    8
@@ -130,6 +130,24 @@ class Vehicle {
       wheelsXOffset = MIN_WHEEL_RADIUS + 1;
       wheelsDistance = getMinWheelsDistance();
       cab.xOffset = 2;
+    }
+
+    void bigBoy() {
+      update(
+        MAX_CAB_WIDTH,
+        MAX_CAB_HEIGHT,
+        MAX_BOX_WIDTH,
+        MAX_BOX_HEIGHT,
+        MAX_WHEEL_RADIUS,
+        true
+      );
+
+      wheelsXOffset = getWheelsXOffset(false);
+      wheelsDistance = getWheelsDistance(false);
+      cab.xOffset = min(
+        box.width - cab.width,
+        max(0, wheelsXOffset + wheelsDistance / 2 - cab.width / 2)
+      );
     }
 
     void randomize() {
