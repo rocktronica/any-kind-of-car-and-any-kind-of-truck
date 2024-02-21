@@ -181,13 +181,12 @@ class Vehicle {
       return wheels[0].radius;
     }
 
-    void setCrouchAndJump(int8_t _crouch, int8_t _jump) {
+    void setCrouch(int8_t _crouch) {
       crouch = _crouch;
-      jump = _jump;
     }
 
     void draw(int16_t x, int16_t y, Arduboy2 arduboy) {
-      int8_t bodyLift = bounce + crouch - jump;
+      int8_t bodyLift = hum + crouch;
 
       int16_t cabX = x + cab.xOffset;
       int16_t cabY = bodyLift + y;
@@ -204,21 +203,20 @@ class Vehicle {
       for (uint8_t i = 0; i < 2; i++) {
         wheels[i].draw(
           x + wheelsX[i],
-          y + WHEELS_SUSPENSION + cab.height - 1 + box.height - jump,
+          y + WHEELS_SUSPENSION + cab.height - 1 + box.height,
           arduboy
         );
       }
 
-      bounce = (bounce - 1) % 2;
+      hum = (hum - 1) % 2;
     }
 
   private:
     uint8_t minWheelXOffset = MIN_WHEEL_X_OFFSET;
     uint8_t gutter = GUTTER;
 
-    int8_t bounce = 0; // TODO: distinguish from jump. jitter?
+    int8_t hum = 0;
     int8_t crouch = 0;
-    int8_t jump = 0;
 
     uint8_t getHoodChamfer() {
       return min(HOOD_CHAMFER, box.width - cab.xOffset - cab.width);

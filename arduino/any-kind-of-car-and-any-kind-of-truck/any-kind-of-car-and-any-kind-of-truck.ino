@@ -7,12 +7,14 @@
 # define INVERT             false
 # define DEBUG              false
 # define GROUND_Y           HEIGHT - 1
+# define JUMP_FRAMES_MAX    2
 
 Arduboy2 arduboy;
 Tinyfont tinyfont = Tinyfont(arduboy.sBuffer, WIDTH, HEIGHT);
 
 Vehicle vehicle;
 int16_t vehicleX = 0;
+int8_t jumpFramesElapsed = JUMP_FRAMES_MAX;
 
 bool showTitleOverlay = true;
 
@@ -49,14 +51,20 @@ void play() {
     tinyfont.print(vehicle.getDebugText());
   }
 
-  vehicle.setCrouchAndJump(
-    arduboy.pressed(DOWN_BUTTON) ? vehicle.getCrouchDistance() : 0,
-    arduboy.pressed(UP_BUTTON) ? VEHICLE_JUMP : 0
+  if (jumpFramesElapsed < JUMP_FRAMES_MAX) {
+    jumpFramesElapsed = jumpFramesElapsed + 1;
+  } else if (arduboy.pressed(UP_BUTTON)) {
+    jumpFramesElapsed = 0;
+  }
+
+  vehicle.setCrouch(
+    arduboy.pressed(DOWN_BUTTON) ? vehicle.getCrouchDistance() : 0
   );
 
   vehicle.draw(
     vehicleX,
-    GROUND_Y + 1 - vehicle.getHeight(),
+    GROUND_Y + 1 - vehicle.getHeight()
+      - (jumpFramesElapsed < JUMP_FRAMES_MAX ? VEHICLE_JUMP : 0),
     arduboy
   );
 
