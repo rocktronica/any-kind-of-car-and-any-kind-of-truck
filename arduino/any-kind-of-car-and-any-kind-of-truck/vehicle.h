@@ -212,9 +212,6 @@ class Vehicle {
     }
 
   private:
-    uint8_t minWheelXOffset = MIN_WHEEL_X_OFFSET;
-    uint8_t gutter = GUTTER;
-
     int8_t hum = 0;
     int8_t crouch = 0;
 
@@ -270,8 +267,8 @@ class Vehicle {
     }
 
     uint8_t getWheelsXOffset(bool randomize) {
-      uint8_t min = minWheelXOffset;
-      uint8_t max = box.width - minWheelXOffset - wheels[0].radius * 2 - 1;
+      uint8_t min = MIN_WHEEL_X_OFFSET;
+      uint8_t max = box.width - MIN_WHEEL_X_OFFSET - wheels[0].radius * 2 - 1;
 
       if (randomize) {
         return random(min, max + 1);
@@ -281,7 +278,7 @@ class Vehicle {
     }
 
     uint8_t getMinWheelsDistance() {
-      return wheels[0].radius * 2 + gutter;
+      return wheels[0].radius * 2 + GUTTER;
     };
 
     uint8_t getWheelsDistance(bool randomize) {
@@ -296,20 +293,20 @@ class Vehicle {
     };
 
     void drawWindows(int16_t cabX, int16_t cabY, int16_t doorX, Arduboy2 arduboy) {
-      uint8_t height = cab.height - gutter;
+      uint8_t height = cab.height - GUTTER;
 
       drawChamferedRectangle(
-        cabX + (gutter + 1),
-        cabY + (gutter + 1),
-        cab.width - (gutter + 1) * 2,
+        cabX + (GUTTER + 1),
+        cabY + (GUTTER + 1),
+        cab.width - (GUTTER + 1) * 2,
         height,
-        max(0, CAB_TOP_CHAMFER - gutter), max(0, CAB_TOP_CHAMFER - gutter), 0, 0,
+        max(0, CAB_TOP_CHAMFER - GUTTER), max(0, CAB_TOP_CHAMFER - GUTTER), 0, 0,
         arduboy
       );
 
       arduboy.drawFastVLine(
         doorX,
-        cabY + (gutter + 1),
+        cabY + (GUTTER + 1),
         cab.height - 2
       );
     }
@@ -354,8 +351,8 @@ class Vehicle {
     }
 
     void drawDoors(int16_t boxY, int16_t cabX, int16_t doorX, Arduboy2 arduboy) {
-      int16_t y = boxY + (gutter + 1);
-      uint8_t height = max(0, box.height - (gutter + 1) * 2);
+      int16_t y = boxY + (GUTTER + 1);
+      uint8_t height = max(0, box.height - (GUTTER + 1) * 2);
 
       if (height > 1) {
         arduboy.drawFastVLine(cabX, y, height);
