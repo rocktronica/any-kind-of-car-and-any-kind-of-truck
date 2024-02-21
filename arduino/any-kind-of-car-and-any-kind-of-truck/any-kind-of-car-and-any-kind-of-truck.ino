@@ -45,7 +45,7 @@ void titleScreen() {
   tinyfont.setCursor(88, 57);
   tinyfont.print("luv:dada");
 
-  vehicle.minimize();
+  vehicle.baby();
   vehicleX = (WIDTH - vehicle.getWidth()) / 2;
 
   vehicle.draw(

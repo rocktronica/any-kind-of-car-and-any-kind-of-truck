@@ -117,7 +117,7 @@ class Vehicle {
       cab.xOffset = 0;
     }
 
-    void minimize() {
+    void baby() {
       update(
         MIN_CAB_WIDTH,
         MIN_CAB_HEIGHT,
