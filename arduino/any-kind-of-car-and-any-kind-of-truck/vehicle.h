@@ -111,10 +111,9 @@ class Vehicle {
         wheels[i].update(wheelRadius);
       }
 
-      wheelsXOffset = getWheelsXOffset(false);
-      wheelsDistance = getWheelsDistance(false);
-
-      cab.xOffset = 0;
+      wheelsXOffset = MIN_WHEEL_X_OFFSET;
+      wheelsDistance = getMaxWheelsDistance();
+      cab.xOffset = getCabXOffset();
     }
 
     void baby() {
@@ -141,13 +140,6 @@ class Vehicle {
         MAX_WHEEL_RADIUS,
         true
       );
-
-      wheelsXOffset = getWheelsXOffset(false);
-      wheelsDistance = getWheelsDistance(false);
-      cab.xOffset = min(
-        box.width - cab.width,
-        max(0, wheelsXOffset + wheelsDistance / 2 - cab.width / 2)
-      );
     }
 
     void randomize() {
@@ -161,14 +153,9 @@ class Vehicle {
         true
       );
 
-      wheelsXOffset = getWheelsXOffset(true);
-      wheelsDistance = getWheelsDistance(true);
-
-      // TODO: don't always center against wheels?
-      cab.xOffset = min(
-        box.width - cab.width,
-        max(0, wheelsXOffset + wheelsDistance / 2 - cab.width / 2)
-      );
+      wheelsXOffset = getRandomWheelsXOffset();
+      wheelsDistance = getRandomWheelsDistance();
+      cab.xOffset = getCabXOffset();
     }
 
     String getDebugText() {
@@ -209,6 +196,26 @@ class Vehicle {
       }
 
       hum = (hum - 1) % 2;
+    }
+
+    int16_t getProperlyExposedX(int16_t x) {
+      return min(
+        max(x, -getWidth() + MIN_X_EXPOSURE),
+        WIDTH - MIN_X_EXPOSURE
+      );
+    }
+
+  int16_t getProperlyExposedXAgainstPreviousWidth(
+      int16_t x,
+      uint8_t previousWidth
+    ) {
+      return min(
+        max(
+          x + (previousWidth - getWidth()) / 2,
+          -previousWidth + MIN_X_EXPOSURE
+        ),
+        WIDTH - MIN_X_EXPOSURE
+      );
     }
 
   private:
@@ -266,30 +273,28 @@ class Vehicle {
       drawPolygon(points, 14, arduboy);
     }
 
-    uint8_t getWheelsXOffset(bool randomize) {
-      uint8_t min = MIN_WHEEL_X_OFFSET;
-      uint8_t max = box.width - MIN_WHEEL_X_OFFSET - wheels[0].radius * 2 - 1;
+    uint8_t getCabXOffset() {
+      // TODO: don't always center against wheels?
+      return max(0, wheelsXOffset + wheelsDistance / 2 - cab.width / 2);
+    }
 
-      if (randomize) {
-        return random(min, max + 1);
-      }
-
-      return min;
+    uint8_t getRandomWheelsXOffset() {
+      return random(
+        MIN_WHEEL_X_OFFSET,
+        box.width - MIN_WHEEL_X_OFFSET - wheels[0].radius * 2 - 1 + 1
+      );
     }
 
     uint8_t getMinWheelsDistance() {
       return wheels[0].radius * 2 + GUTTER;
     };
 
-    uint8_t getWheelsDistance(bool randomize) {
-      uint8_t max = box.width - wheelsXOffset - 1;
-      uint8_t min = getMinWheelsDistance();
+    uint8_t getMaxWheelsDistance() {
+      return box.width - wheelsXOffset - 1;
+    };
 
-      if (randomize) {
-        return random(min, max + 1);
-      }
-
-      return max;
+    uint8_t getRandomWheelsDistance() {
+      return random(getMinWheelsDistance(), getMaxWheelsDistance() + 1);
     };
 
     void drawWindows(int16_t cabX, int16_t cabY, int16_t doorX, Arduboy2 arduboy) {
@@ -363,12 +368,5 @@ class Vehicle {
 
     // TODO: side mirrors
 };
-
-int16_t getProperlyExposedX(int16_t x, uint8_t vehicleWidth) {
-    return min(
-      max(x, -vehicleWidth + MIN_X_EXPOSURE),
-      WIDTH - MIN_X_EXPOSURE
-    );
-}
 
 #endif
