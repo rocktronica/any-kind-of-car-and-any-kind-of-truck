@@ -20,7 +20,6 @@
 # define CAB_JOINT_CHAMFER    1
 # define HOOD_CHAMFER         3
 
-# define WHEELS_SUSPENSION    0   // TODO: increase on jump
 # define WHEEL_TREAD          5
 # define MIN_WHEEL_RADIUS     3
 # define MAX_WHEEL_RADIUS     25
@@ -72,12 +71,12 @@ class Vehicle {
     Box box;
     Wheel wheels[2];
 
-    // THINK: Is there a more obvious way to express/name this?
-    uint8_t trunkToHood; // Avoiding a float. 0 = 0%; 255 = 100%
-    uint8_t wheelsDistance;
+    void setSuspension(int8_t _suspension) {
+      suspension = _suspension;
+ }
 
     uint8_t getHeight() {
-      return cab.height + box.height + WHEELS_SUSPENSION + wheels[0].radius + 1;
+      return cab.height + box.height + suspension + wheels[0].radius + 1;
     }
 
     uint8_t getWidth() {
@@ -150,21 +149,15 @@ class Vehicle {
         "W:" + String(wheels[0].radius);
     }
 
-    uint8_t getCrouchDistance() {
+    uint8_t getWheelRadius() {
       return wheels[0].radius;
     }
 
-    void setCrouch(int8_t _crouch) {
-      crouch = _crouch;
-    }
-
     void draw(int16_t x, int16_t y, Arduboy2 arduboy) {
-      int8_t bodyLift = hum + crouch;
-
       int16_t cabX = x + getCabXFromBox();
-      int16_t cabY = bodyLift + y;
+      int16_t cabY = y + hum;
       int16_t boxX = x;
-      int16_t boxY = bodyLift + y + cab.height;
+      int16_t boxY = y + hum + cab.height;
       int16_t doorX = cabX + cab.width * .4; // TODO: arbitrary
 
       drawOutline(cabX, cabY, boxX, boxY, arduboy);
@@ -179,7 +172,7 @@ class Vehicle {
       for (uint8_t i = 0; i < 2; i++) {
         wheels[i].draw(
           x + wheelsX[i],
-          y + WHEELS_SUSPENSION + cab.height - 1 + box.height,
+          y + suspension + cab.height - 1 + box.height,
           arduboy
         );
       }
@@ -208,8 +201,12 @@ class Vehicle {
     }
 
   private:
+    // THINK: Is there a more obvious way to express/name this?
+    uint8_t trunkToHood; // Avoiding a float. 0 = 0%; 255 = 100%
+    uint8_t wheelsDistance;
+
     int8_t hum = 0;
-    int8_t crouch = 0;
+    int8_t suspension = 0;
 
     uint8_t getCabXFromBox() {
       return (box.width - cab.width) * (trunkToHood / 255.0);

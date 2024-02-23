@@ -98,9 +98,13 @@ void play() {
     sound.tones(crouchTones);
   }
 
-  vehicle.setCrouch(
-    arduboy.pressed(DOWN_BUTTON) ? vehicle.getCrouchDistance() : 0
-  );
+  if (arduboy.pressed(DOWN_BUTTON)) {
+    vehicle.setSuspension(-vehicle.getWheelRadius());
+  } else if (jumpFramesElapsed < JUMP_FRAMES_MAX) {
+    vehicle.setSuspension(vehicle.getWheelRadius() / 2);
+  } else {
+    vehicle.setSuspension(0);
+  }
 
   vehicle.draw(
     vehicleX,
