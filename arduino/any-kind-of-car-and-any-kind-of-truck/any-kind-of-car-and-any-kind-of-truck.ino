@@ -54,7 +54,8 @@ const uint16_t crouchTones[] PROGMEM = {
 };
 
 void setup() {
-  arduboy.beginDoFirst(); // TODO: use .begin() for Arduboy splash
+  arduboy.beginDoFirst();
+  arduboy.waitNoButtons();
 
   arduboy.setFrameRate(15);
 
