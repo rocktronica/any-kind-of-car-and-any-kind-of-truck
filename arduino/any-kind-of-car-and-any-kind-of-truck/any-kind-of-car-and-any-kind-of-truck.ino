@@ -37,7 +37,7 @@ void setup() {
   vehicle.baby();
   vehicleX = (WIDTH - vehicle.getWidth()) / 2;
 
-  sound.tones(themeTones);
+  sound.tones(THEME_TONES);
 }
 
 void titleOverlay() {
@@ -74,9 +74,9 @@ void play() {
     jumpFramesElapsed = jumpFramesElapsed + 1;
   } else if (arduboy.pressed(UP_BUTTON)) {
     jumpFramesElapsed = 0;
-    sound.tones(jumpTones);
+    sound.tones(JUMP_TONES);
   } else if (arduboy.pressed(DOWN_BUTTON)) {
-    sound.tones(crouchTones);
+    sound.tones(CROUCH_TONES);
   }
 
   if (arduboy.pressed(DOWN_BUTTON)) {
@@ -98,7 +98,7 @@ void play() {
       showTitleOverlay = !showTitleOverlay;
 
       if (showTitleOverlay) {
-        sound.tones(themeTones);
+        sound.tones(THEME_TONES);
         themePlayingFramesElapsed = 0;
       } else {
         sound.noTone();
@@ -110,17 +110,17 @@ void play() {
       vehicle.randomize();
       vehicleX = vehicle.getProperlyExposedXAgainstPreviousWidth(vehicleX, previousWidth);
 
-      sound.tones(changeTones);
+      sound.tones(CHANGE_TONES);
   }
 
   if (arduboy.pressed(LEFT_BUTTON)) {
     vehicleX = vehicle.getProperlyExposedX(vehicleX - VEHICLE_TRAVEL);
-    sound.tones(moveTones);
+    sound.tones(MOVE_TONES);
   }
 
   if (arduboy.pressed(RIGHT_BUTTON)) {
     vehicleX = vehicle.getProperlyExposedX(vehicleX + VEHICLE_TRAVEL);
-    sound.tones(moveTones);
+    sound.tones(MOVE_TONES);
   }
 
   if (arduboy.pressed(A_BUTTON | B_BUTTON)) {
