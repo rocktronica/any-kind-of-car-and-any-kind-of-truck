@@ -24,6 +24,7 @@ int8_t jumpFramesElapsed = JUMP_FRAMES_MAX;
 int16_t themePlayingFramesElapsed = 0;
 
 bool showTitleOverlay = true;
+bool showAllTitleParts = false;
 
 void setup() {
   arduboy.beginDoFirst();
@@ -43,14 +44,14 @@ void setup() {
 void titleOverlay() {
   Sprites::drawSelfMasked(8, 8, title, 0);
 
-  if (themePlayingFramesElapsed >= THEME_1_FRAMES) {
+  if (themePlayingFramesElapsed >= THEME_1_FRAMES || showAllTitleParts) {
     tinyfont.setCursor(26, 30);
     tinyfont.print("ANY KIND OF ANY");
     tinyfont.setCursor(31, 36);
     tinyfont.print("CAR AND TRUCK");
   }
 
-  if (themePlayingFramesElapsed >= THEME_2_FRAMES) {
+  if (themePlayingFramesElapsed >= THEME_2_FRAMES || showAllTitleParts) {
     tinyfont.setCursor(2, 57);
     tinyfont.print("2024");
     tinyfont.setCursor(88, 52);
@@ -75,8 +76,10 @@ void play() {
   } else if (arduboy.pressed(UP_BUTTON)) {
     jumpFramesElapsed = 0;
     sound.tones(JUMP_TONES);
+    showAllTitleParts = true;
   } else if (arduboy.pressed(DOWN_BUTTON)) {
     sound.tones(CROUCH_TONES);
+    showAllTitleParts = true;
   }
 
   if (arduboy.pressed(DOWN_BUTTON)) {
@@ -100,6 +103,7 @@ void play() {
       if (showTitleOverlay) {
         sound.tones(THEME_TONES);
         themePlayingFramesElapsed = 0;
+        showAllTitleParts = false;
       } else {
         sound.noTone();
       }
@@ -111,16 +115,19 @@ void play() {
       vehicleX = vehicle.getProperlyExposedXAgainstPreviousWidth(vehicleX, previousWidth);
 
       sound.tones(CHANGE_TONES);
+      showAllTitleParts = true;
   }
 
   if (arduboy.pressed(LEFT_BUTTON)) {
     vehicleX = vehicle.getProperlyExposedX(vehicleX - VEHICLE_TRAVEL);
     sound.tones(MOVE_TONES);
+    showAllTitleParts = true;
   }
 
   if (arduboy.pressed(RIGHT_BUTTON)) {
     vehicleX = vehicle.getProperlyExposedX(vehicleX + VEHICLE_TRAVEL);
     sound.tones(MOVE_TONES);
+    showAllTitleParts = true;
   }
 
   if (arduboy.pressed(A_BUTTON | B_BUTTON)) {
@@ -128,12 +135,14 @@ void play() {
       uint8_t previousWidth = vehicle.getWidth();
       vehicle.baby();
       vehicleX = vehicle.getProperlyExposedXAgainstPreviousWidth(vehicleX, previousWidth);
+      showAllTitleParts = true;
     }
 
     if (arduboy.justPressed(UP_BUTTON)) {
       uint8_t previousWidth = vehicle.getWidth();
       vehicle.bigBoy();
       vehicleX = vehicle.getProperlyExposedXAgainstPreviousWidth(vehicleX, previousWidth);
+      showAllTitleParts = true;
     }
   }
 }
