@@ -20,11 +20,10 @@
 # define CAB_JOINT_CHAMFER    1
 # define HOOD_CHAMFER         3
 
-# define WHEELS_SUSPENSION    0
+# define WHEELS_SUSPENSION    0   // TODO: increase on jump
 # define WHEEL_TREAD          5
 # define MIN_WHEEL_RADIUS     3
 # define MAX_WHEEL_RADIUS     25
-# define MIN_WHEEL_X_OFFSET   0
 
 # define MAX_BUMPER_HEIGHT    8
 # define MIN_BUMPER_HEIGHT    5
@@ -43,7 +42,6 @@
 struct Cab {
   uint8_t width;
   uint8_t height;
-  uint8_t xOffset;
 };
 
 struct Box {
@@ -73,8 +71,9 @@ class Vehicle {
     Box box;
     Wheel wheels[2];
 
+    // THINK: Is there a more obvious way to express/name this?
+    uint8_t trunkToHood; // Avoiding a float. 0 = 0%; 255 = 100%
     uint8_t wheelsDistance;
-    uint8_t wheelsXOffset = MIN_WHEEL_X_OFFSET;
 
     uint8_t getHeight() {
       return cab.height + box.height + WHEELS_SUSPENSION + wheels[0].radius + 1;
@@ -111,9 +110,8 @@ class Vehicle {
         wheels[i].update(wheelRadius);
       }
 
-      wheelsXOffset = MIN_WHEEL_X_OFFSET;
+      trunkToHood = (255 / 2);
       wheelsDistance = getMaxWheelsDistance();
-      cab.xOffset = getCabXOffset();
     }
 
     void baby() {
@@ -126,9 +124,8 @@ class Vehicle {
         true
       );
 
-      wheelsXOffset = MIN_WHEEL_RADIUS + 1;
+      trunkToHood = (255 / 2);
       wheelsDistance = getMinWheelsDistance();
-      cab.xOffset = 2;
     }
 
     void bigBoy() {
@@ -153,9 +150,8 @@ class Vehicle {
         true
       );
 
-      wheelsXOffset = getRandomWheelsXOffset();
+      trunkToHood = random(0, 255);
       wheelsDistance = getRandomWheelsDistance();
-      cab.xOffset = getCabXOffset();
     }
 
     String getDebugText() {
@@ -175,7 +171,7 @@ class Vehicle {
     void draw(int16_t x, int16_t y, Arduboy2 arduboy) {
       int8_t bodyLift = hum + crouch;
 
-      int16_t cabX = x + cab.xOffset;
+      int16_t cabX = x + getCabXFromBox();
       int16_t cabY = bodyLift + y;
       int16_t boxX = x;
       int16_t boxY = bodyLift + y + cab.height;
@@ -186,7 +182,10 @@ class Vehicle {
       drawBumpersAndLights(boxX, boxY, arduboy);
       drawDoors(boxY, cabX, doorX, arduboy);
 
-      int16_t wheelsX[2] = {wheelsXOffset, wheelsXOffset + wheelsDistance};
+      int16_t wheelsX[2] = {
+        getWheelsXFromBox(),
+        getWheelsXFromBox() + wheelsDistance
+      };
       for (uint8_t i = 0; i < 2; i++) {
         wheels[i].draw(
           x + wheelsX[i],
@@ -222,8 +221,16 @@ class Vehicle {
     int8_t hum = 0;
     int8_t crouch = 0;
 
+    uint8_t getCabXFromBox() {
+      return (box.width - cab.width) * (trunkToHood / 255.0);
+    }
+
+    uint8_t getWheelsXFromBox() {
+      return (box.width - wheelsDistance) * (trunkToHood / 255.0);
+    }
+
     uint8_t getHoodChamfer() {
-      return min(HOOD_CHAMFER, box.width - cab.xOffset - cab.width);
+      return min(HOOD_CHAMFER, box.width - getCabXFromBox() - cab.width);
     }
 
     uint8_t getBumperHeight() {
@@ -246,12 +253,17 @@ class Vehicle {
 
       Arduboy2 arduboy
     ) {
-      uint8_t trunkChamfer = min(TRUNK_CHAMFER, cab.xOffset);
+      uint8_t trunkChamfer = min(TRUNK_CHAMFER, getCabXFromBox());
       uint8_t hoodChamfer = getHoodChamfer();
 
-      uint8_t cabBackJointChamfer = min(CAB_JOINT_CHAMFER, cab.xOffset - trunkChamfer);
-      uint8_t cabFrontJointChamfer =
-        min(CAB_JOINT_CHAMFER, box.width - cab.xOffset - cab.width - hoodChamfer);
+      uint8_t cabBackJointChamfer = min(
+        CAB_JOINT_CHAMFER,
+        getCabXFromBox() - trunkChamfer
+      );
+      uint8_t cabFrontJointChamfer = min(
+        CAB_JOINT_CHAMFER,
+        box.width - getCabXFromBox() - cab.width - hoodChamfer
+      );
 
       // Clockwise from top left of box
       Xy points[14] = {
@@ -273,28 +285,16 @@ class Vehicle {
       drawPolygon(points, 14, arduboy);
     }
 
-    uint8_t getCabXOffset() {
-      // TODO: don't always center against wheels?
-      return max(0, wheelsXOffset + wheelsDistance / 2 - cab.width / 2);
-    }
-
-    uint8_t getRandomWheelsXOffset() {
-      return random(
-        MIN_WHEEL_X_OFFSET,
-        box.width - MIN_WHEEL_X_OFFSET - wheels[0].radius * 2 - 1 + 1
-      );
-    }
-
     uint8_t getMinWheelsDistance() {
       return wheels[0].radius * 2 + GUTTER;
     };
 
     uint8_t getMaxWheelsDistance() {
-      return box.width - wheelsXOffset - 1;
+      return box.width;
     };
 
     uint8_t getRandomWheelsDistance() {
-      return random(getMinWheelsDistance(), getMaxWheelsDistance() + 1);
+      return random(getMinWheelsDistance(), getMaxWheelsDistance());
     };
 
     void drawWindows(int16_t cabX, int16_t cabY, int16_t doorX, Arduboy2 arduboy) {
