@@ -143,12 +143,6 @@ class Vehicle {
       wheelsDistance = getRandomWheelsDistance();
     }
 
-    String getDebugText() {
-      return "C:" + String(cab.width) + "x" + String(cab.height) + "\n" +
-        "B:" + String(box.width) + "x" + String(box.height) + "\n" +
-        "W:" + String(wheels[0].radius);
-    }
-
     uint8_t getWheelRadius() {
       return wheels[0].radius;
     }

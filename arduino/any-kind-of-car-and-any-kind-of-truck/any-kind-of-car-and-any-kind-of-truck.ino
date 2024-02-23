@@ -7,7 +7,6 @@
 #include "vehicle.h"
 
 # define INVERT             false
-# define DEBUG              false
 # define GROUND_Y           HEIGHT - 1
 # define JUMP_FRAMES_MAX    2
 
@@ -22,6 +21,7 @@ Vehicle vehicle;
 int16_t vehicleX = 0;
 int8_t jumpFramesElapsed = JUMP_FRAMES_MAX;
 int16_t themePlayingFramesElapsed = 0;
+int16_t score = 0;
 
 bool showTitleOverlay = true;
 bool showAllTitleParts = false;
@@ -32,7 +32,6 @@ void setup() {
 
   arduboy.setFrameRate(15);
 
-  arduboy.initRandomSeed();
   arduboy.invert(INVERT);
 
   vehicle.baby();
@@ -66,11 +65,6 @@ void titleOverlay() {
 }
 
 void play() {
-  if (DEBUG) {
-    tinyfont.setCursor(1, 1);
-    tinyfont.print(vehicle.getDebugText());
-  }
-
   if (jumpFramesElapsed < JUMP_FRAMES_MAX) {
     jumpFramesElapsed = jumpFramesElapsed + 1;
   } else if (arduboy.pressed(UP_BUTTON)) {
@@ -116,6 +110,8 @@ void play() {
 
       sound.tones(CHANGE_TONES);
       showAllTitleParts = true;
+
+      score += 1;
   }
 
   if (arduboy.pressed(LEFT_BUTTON)) {
@@ -161,6 +157,9 @@ void loop() {
 
   if (showTitleOverlay) {
     titleOverlay();
+  } else {
+    tinyfont.setCursor(1, 1);
+    tinyfont.print("SCORE:" + String(score));
   }
 
   arduboy.display();
