@@ -42,12 +42,12 @@ void setup() {
 }
 
 void titleOverlay() {
-  Sprites::drawSelfMasked(8, 8, title, 0);
+  Sprites::drawSelfMasked(9, 2, title, 0);
 
   if (themePlayingFramesElapsed >= THEME_1_FRAMES || showAllTitleParts) {
-    tinyfont.setCursor(26, 30);
+    tinyfont.setCursor(26, 33);
     tinyfont.print("ANY KIND OF ANY");
-    tinyfont.setCursor(31, 36);
+    tinyfont.setCursor(31, 38);
     tinyfont.print("CAR AND TRUCK");
   }
 
