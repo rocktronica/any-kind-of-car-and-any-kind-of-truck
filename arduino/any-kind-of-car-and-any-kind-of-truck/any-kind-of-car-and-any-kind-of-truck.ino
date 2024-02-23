@@ -10,6 +10,9 @@
 # define GROUND_Y           HEIGHT - 1
 # define JUMP_FRAMES_MAX    2
 
+# define THEME_1_FRAMES     29
+# define THEME_2_FRAMES     55
+
 Arduboy2 arduboy;
 ArduboyTones sound(arduboy.audio.enabled);
 Tinyfont tinyfont = Tinyfont(arduboy.sBuffer, WIDTH, HEIGHT);
@@ -17,11 +20,12 @@ Tinyfont tinyfont = Tinyfont(arduboy.sBuffer, WIDTH, HEIGHT);
 Vehicle vehicle;
 int16_t vehicleX = 0;
 int8_t jumpFramesElapsed = JUMP_FRAMES_MAX;
+int16_t themePlayingFramesElapsed = 0;
 
 bool showTitleOverlay = true;
 
+// TODO: extract
 // https://onlinesequencer.net/3857464
-// TODO: split into text sections
 const uint16_t themeTones[] PROGMEM = {
  NOTE_G3,34,
  NOTE_C5,136, NOTE_C5,136, NOTE_C5,136, NOTE_C5,136, NOTE_G4,204, NOTE_REST,68, NOTE_G4,136, NOTE_E4,136,
@@ -71,17 +75,25 @@ void setup() {
 void titleOverlay() {
   Sprites::drawSelfMasked(8, 8, title, 0);
 
-  tinyfont.setCursor(26, 30);
-  tinyfont.print("ANY KIND OF ANY");
-  tinyfont.setCursor(31, 36);
-  tinyfont.print("CAR AND TRUCK");
+  if (themePlayingFramesElapsed >= THEME_1_FRAMES) {
+    tinyfont.setCursor(26, 30);
+    tinyfont.print("ANY KIND OF ANY");
+    tinyfont.setCursor(31, 36);
+    tinyfont.print("CAR AND TRUCK");
+  }
 
-  tinyfont.setCursor(2, 57);
-  tinyfont.print("2024");
-  tinyfont.setCursor(88, 52);
-  tinyfont.print("for:desi");
-  tinyfont.setCursor(88, 57);
-  tinyfont.print("luv:dada");
+  if (themePlayingFramesElapsed >= THEME_2_FRAMES) {
+    tinyfont.setCursor(2, 57);
+    tinyfont.print("2024");
+    tinyfont.setCursor(88, 52);
+    tinyfont.print("for:desi");
+    tinyfont.setCursor(88, 57);
+    tinyfont.print("luv:dada");
+  }
+
+  if (themePlayingFramesElapsed < THEME_2_FRAMES) {
+    themePlayingFramesElapsed += 1;
+  }
 }
 
 void play() {
@@ -119,6 +131,7 @@ void play() {
 
       if (showTitleOverlay) {
         sound.tones(themeTones);
+        themePlayingFramesElapsed = 0;
       } else {
         sound.noTone();
       }
