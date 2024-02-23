@@ -57,6 +57,7 @@ class Wheel {
       radius = _radius;
     }
 
+    // TODO: cool hub caps
     void draw(int16_t x, int16_t y, Arduboy2 arduboy) {
       arduboy.drawCircle(x, y, radius, WHITE);
       arduboy.fillCircle(x, y, radius - 1, BLACK);
@@ -88,23 +89,15 @@ class Vehicle {
       uint8_t cabHeight,
       uint8_t boxWidth,
       uint8_t boxHeight,
-      uint8_t wheelRadius,
-      bool fixValues
+      uint8_t wheelRadius
     ) {
-      cab.width = cabWidth;
+      cab.width = min(cabWidth, boxWidth);
       cab.height = cabHeight;
 
       box.width = boxWidth;
       box.height = boxHeight;
 
-      if (fixValues) {
-        wheelRadius = min(
-          box.height,
-          min(box.width / 4, wheelRadius)
-        );
-
-        cab.width = min(cab.width, box.width);
-      }
+      wheelRadius = min((box.width - GUTTER) / 2, wheelRadius);
 
       for (uint8_t i = 0; i < 2; i++) {
         wheels[i].update(wheelRadius);
@@ -120,8 +113,7 @@ class Vehicle {
         MIN_CAB_HEIGHT,
         MIN_BOX_WIDTH,
         MIN_BOX_HEIGHT,
-        MIN_WHEEL_RADIUS,
-        true
+        MIN_WHEEL_RADIUS
       );
 
       trunkToHood = (255 / 2);
@@ -134,8 +126,7 @@ class Vehicle {
         MAX_CAB_HEIGHT,
         MAX_BOX_WIDTH,
         MAX_BOX_HEIGHT,
-        MAX_WHEEL_RADIUS,
-        true
+        MAX_WHEEL_RADIUS
       );
     }
 
@@ -146,8 +137,7 @@ class Vehicle {
         random(MIN_CAB_HEIGHT, MAX_CAB_HEIGHT),
         random(MIN_BOX_WIDTH, MAX_BOX_WIDTH),
         random(MIN_BOX_HEIGHT, MAX_BOX_HEIGHT),
-        random(MIN_WHEEL_RADIUS, MAX_WHEEL_RADIUS),
-        true
+        random(MIN_WHEEL_RADIUS, MAX_WHEEL_RADIUS)
       );
 
       trunkToHood = random(0, 255);

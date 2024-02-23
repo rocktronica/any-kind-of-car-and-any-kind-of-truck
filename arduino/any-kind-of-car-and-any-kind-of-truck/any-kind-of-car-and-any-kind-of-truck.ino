@@ -21,6 +21,7 @@ int8_t jumpFramesElapsed = JUMP_FRAMES_MAX;
 bool showTitleOverlay = true;
 
 // https://onlinesequencer.net/3857464
+// TODO: split into text sections
 const uint16_t themeTones[] PROGMEM = {
  NOTE_G3,34,
  NOTE_C5,136, NOTE_C5,136, NOTE_C5,136, NOTE_C5,136, NOTE_G4,204, NOTE_REST,68, NOTE_G4,136, NOTE_E4,136,
