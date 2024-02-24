@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 2,
+  "title": "Any Kind of Car and Any Kind of Truck",
+  "description": "An Ardubody ~game for my vehicle-obsessed toddler!",
+  "author": "rocktronica",
+  "version": "0",
+  "date": "2024-02-12",
+  "genre": "Demo",
+  "publisher": "",
+  "idea": "",
+  "code": "",
+  "art": "",
+  "sound": "",
+  "url": "https://github.com/rocktronica/any-kind-of-car-and-any-kind-of-truck",
+  "sourceUrl": "",
+  "email": "",
+  "companion": "",
+  "banner": "banner.png",
+  "screenshots": [
+    {
+      "title": "Title",
+      "filename": "screenshots/title.png"
+    },
+    {
+      "title": "Good car",
+      "filename": "screenshots/goodcar.png"
+    },
+    {
+      "title": "Long car",
+      "filename": "screenshots/long.png"
+    },
+    {
+      "title": "Tractor w/ big ol wheels",
+      "filename": "screenshots/tractor.png"
+    },
+  ],
+  "binaries": [
+    {
+      "title": "Any Kind of Car and Any Kind of Truck",
+      "filename": "any-kind-of-car-and-any-kind-of-truck.ino.hex",
+      "device": "Arduboy"
+    }
+  ],
+  "buttons": [
+    {
+      "control": "A",
+      "action": "toggle title"
+    },
+    {
+      "control": "B",
+      "action": "randomize vehicle"
+    },
+    {
+      "control": "Up",
+      "action": "jump"
+    },
+    {
+      "control": "Down",
+      "action": "crouch"
+    },
+    {
+      "control": "Left",
+      "action": "move left"
+    },
+    {
+      "control": "Right",
+      "action": "move right"
+    },
+    {
+      "control": "A + B + up",
+      "action": "big car"
+    },
+    {
+      "control": "A + B + down",
+      "action": "baby car"
+    }
+  ],
+  "eeprom": {
+    "variable": false,
+    "start": 0,
+    "end": 0
+  }
+}
