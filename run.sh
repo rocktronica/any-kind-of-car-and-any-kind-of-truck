@@ -23,6 +23,8 @@ CLI wrapper around Arduino and Ardens
 Usage:
 ./run.sh -h                 Show help and exit
 
+./run.sh compile            Compile
+./run.sh emulate            Emulate
 ./run.sh dev                Compile and emuluate
                             Looped! Quit emulator to refresh
 ./run.sh deploy             Compile and upload
@@ -72,6 +74,16 @@ function upload() {
 
 if [ "$1" == '-h' ]; then
     help
+    exit
+fi
+
+if [ "$1" == 'compile' ]; then
+    compile
+    exit
+fi
+
+if [ "$1" == 'emulate' ]; then
+    emulate
     exit
 fi
 
