@@ -6,7 +6,7 @@
 
 An Ardubody ~game for my vehicle-obsessed toddler! Make randomly dimensioned vehicles and move them around.
 
-| Buttons | Acttion |
+| Buttons | Action |
 | -- | -- |
 | A | toggle title |
 | B | randomize vehicle |
